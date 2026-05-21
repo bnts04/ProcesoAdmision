@@ -21,5 +21,6 @@ public class PuntajePostulanteResponse {
     private BigDecimal puntajeBruto;
     private BigDecimal puntajeFinal;
 
+    private Boolean puntajeCalculado;
     private String observacion;
 }

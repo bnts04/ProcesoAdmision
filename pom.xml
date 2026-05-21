@@ -45,12 +45,23 @@
             <artifactId>poi-ooxml</artifactId>
             <version>5.2.5</version>
         </dependency>
-
+        <!-- JavaDBF para leer archivos .dbf -->
+        <dependency>
+            <groupId>com.github.albfernandez</groupId>
+            <artifactId>javadbf</artifactId>
+            <version>1.14.1</version>
+        </dependency>
         <!-- OpenPDF para generar documentos PDF -->
         <dependency>
             <groupId>com.github.librepdf</groupId>
             <artifactId>openpdf</artifactId>
             <version>1.3.39</version>
+        </dependency>
+        <!-- Apache PDFBox para leer texto de archivos PDF -->
+        <dependency>
+            <groupId>org.apache.pdfbox</groupId>
+            <artifactId>pdfbox</artifactId>
+            <version>3.0.7</version>
         </dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

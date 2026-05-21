@@ -47,6 +47,7 @@ public class GuardarResultadosService {
                         .blancas(p.getBlancas())
                         .puntajeBruto(p.getPuntajeBruto())
                         .puntajeFinal(p.getPuntajeFinal())
+                        .puntajeCalculado(p.getPuntajeCalculado())
                         .ome(null)
                         .omg(null)
                         .condicion(CondicionPostulante.PENDIENTE)

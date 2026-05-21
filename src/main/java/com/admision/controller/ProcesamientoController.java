@@ -14,6 +14,8 @@ import com.admision.dto.OrdenMeritoResponse;
 import com.admision.service.procesamiento.OrdenMeritoService;
 import com.admision.dto.CondicionIngresoResponse;
 import com.admision.service.procesamiento.CondicionIngresoService;
+import com.admision.dto.DiagnosticoTemaResponse;
+import com.admision.service.procesamiento.DiagnosticoTemaService;
 
 import java.util.List;
 
@@ -28,6 +30,7 @@ public class ProcesamientoController {
     private final AsignacionCarrerasService asignacionCarrerasService;
     private final OrdenMeritoService ordenMeritoService;
     private final CondicionIngresoService condicionIngresoService;
+    private final DiagnosticoTemaService diagnosticoTemaService;
 
     @GetMapping("/cruce-respuestas-identificacion/{procesoId}")
     public List<PostulanteConRespuestasResponse> cruzarRespuestasConIdentificacion(
@@ -67,5 +70,10 @@ public class ProcesamientoController {
     @PostMapping("/calcular-condicion/{procesoId}")
     public CondicionIngresoResponse calcularCondicionIngreso(@PathVariable Long procesoId) {
         return condicionIngresoService.calcularCondicionIngreso(procesoId);
+    }
+
+    @GetMapping("/diagnostico-temas/{procesoId}")
+    public DiagnosticoTemaResponse diagnosticarTemas(@PathVariable Long procesoId) {
+        return diagnosticoTemaService.diagnosticarTemas(procesoId);
     }
 }

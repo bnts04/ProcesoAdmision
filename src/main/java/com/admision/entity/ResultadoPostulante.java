@@ -63,6 +63,9 @@ public class ResultadoPostulante {
     @Column(name = "puntaje_final", precision = 10, scale = 4)
     private BigDecimal puntajeFinal;
 
+    @Column(name = "puntaje_calculado", nullable = false)
+    private Boolean puntajeCalculado;
+
     @Column(name = "ome")
     private Integer ome;
 
@@ -85,6 +88,10 @@ public class ResultadoPostulante {
 
         if (this.condicion == null) {
             this.condicion = CondicionPostulante.PENDIENTE;
+        }
+
+        if (this.puntajeCalculado == null) {
+            this.puntajeCalculado = false;
         }
     }
 }

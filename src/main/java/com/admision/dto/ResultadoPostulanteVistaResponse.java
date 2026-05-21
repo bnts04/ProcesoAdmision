@@ -30,12 +30,14 @@ public class ResultadoPostulanteVistaResponse {
 
     private BigDecimal puntajeBruto;
     private BigDecimal puntajeFinal;
+    private Boolean puntajeCalculado;
 
     private Integer ome;
     private Integer omg;
 
     private CondicionPostulante condicion;
     private String observacion;
+
 
     public static ResultadoPostulanteVistaResponse fromEntity(ResultadoPostulante resultado, Long procesoId) {
         return ResultadoPostulanteVistaResponse.builder()
@@ -54,6 +56,7 @@ public class ResultadoPostulanteVistaResponse {
                 .blancas(resultado.getBlancas())
                 .puntajeBruto(resultado.getPuntajeBruto())
                 .puntajeFinal(resultado.getPuntajeFinal())
+                .puntajeCalculado(resultado.getPuntajeCalculado())
                 .ome(resultado.getOme())
                 .omg(resultado.getOmg())
                 .condicion(resultado.getCondicion())

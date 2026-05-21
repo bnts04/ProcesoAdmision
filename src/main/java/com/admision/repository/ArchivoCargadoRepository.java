@@ -19,4 +19,6 @@ public interface ArchivoCargadoRepository extends JpaRepository<ArchivoCargado, 
             Long procesoId,
             TipoArchivo tipoArchivo
     );
+
+    Optional<ArchivoCargado> findTopByTipoArchivoOrderByFechaCargaDesc(TipoArchivo tipoArchivo);
 }

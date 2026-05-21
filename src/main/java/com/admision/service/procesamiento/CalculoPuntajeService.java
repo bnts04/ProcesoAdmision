@@ -52,6 +52,23 @@ public class CalculoPuntajeService {
             Map<String, ClaveTemaResponse> clavesPorTema
     ) {
         String temaNormalizado = normalizarTexto(postulante.getTema());
+
+        if (postulante.getTemaValido() == null || !postulante.getTemaValido() || temaNormalizado.isBlank()) {
+            return PuntajePostulanteResponse.builder()
+                    .codigo(postulante.getCodigo())
+                    .litho(postulante.getLitho())
+                    .tema(postulante.getTema())
+                    .secuencia(postulante.getSecuencia())
+                    .correctas(0)
+                    .incorrectas(0)
+                    .blancas(0)
+                    .puntajeBruto(BigDecimal.ZERO)
+                    .puntajeFinal(BigDecimal.ZERO)
+                    .puntajeCalculado(false)
+                    .observacion(postulante.getObservacionTema() + " | No se calculó puntaje")
+                    .build();
+        }
+
         ClaveTemaResponse clave = clavesPorTema.get(temaNormalizado);
 
         if (clave == null) {
@@ -65,7 +82,8 @@ public class CalculoPuntajeService {
                     .blancas(0)
                     .puntajeBruto(BigDecimal.ZERO)
                     .puntajeFinal(BigDecimal.ZERO)
-                    .observacion("No se encontró clave para el tema " + postulante.getTema())
+                    .puntajeCalculado(false)
+                    .observacion("No se encontró clave para el tema " + postulante.getTema() + " | No se calculó puntaje")
                     .build();
         }
 
@@ -107,6 +125,7 @@ public class CalculoPuntajeService {
                 .blancas(blancas)
                 .puntajeBruto(puntajeBruto)
                 .puntajeFinal(puntajeFinal)
+                .puntajeCalculado(true)
                 .observacion("Puntaje calculado correctamente")
                 .build();
     }

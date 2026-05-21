@@ -19,10 +19,11 @@ public class CruceIdentificacionRespuestasService {
 
     public List<PostulanteConRespuestasResponse> cruzarRespuestasConIdentificacion(Long procesoId, Integer limite) {
 
-        List<RespuestaPostulanteExcelResponse> respuestas = respuestasExcelService.leerRespuestas(procesoId, limite);
+        List<RespuestaPostulanteExcelResponse> respuestas =
+                respuestasExcelService.leerRespuestas(procesoId, limite);
 
         /*
-         * Aquí leemos todas las identificaciones porque el orden de RESPUEST
+         * Leemos todas las identificaciones porque el orden de RESPUEST
          * y el orden de IDENTIFI no necesariamente coinciden.
          */
         List<IdentificacionPostulanteExcelResponse> identificaciones =
@@ -47,28 +48,90 @@ public class CruceIdentificacionRespuestasService {
                     identificacionPorLitho.get(lithoNormalizado);
 
             if (identificacion == null) {
+                ResultadoTema resultadoTema = resolverTema(
+                        respuesta.getTema(),
+                        null
+                );
+
                 resultado.add(PostulanteConRespuestasResponse.builder()
                         .codigo("NO_ENCONTRADO")
                         .litho(respuesta.getLitho())
-                        .tema(respuesta.getTema())
+                        .tema(resultadoTema.temaFinal())
+                        .temaRespuest(respuesta.getTema())
+                        .temaIdentifi(null)
                         .secuencia(null)
                         .totalPreguntas(respuesta.getTotalPreguntas())
                         .respuestas(respuesta.getRespuestas())
+                        .temaValido(false)
+                        .observacionTema("No se encontró LITHO en IDENTIFI")
                         .build());
+
                 continue;
             }
+
+            ResultadoTema resultadoTema = resolverTema(
+                    respuesta.getTema(),
+                    identificacion.getTema()
+            );
 
             resultado.add(PostulanteConRespuestasResponse.builder()
                     .codigo(identificacion.getCodigo())
                     .litho(respuesta.getLitho())
-                    .tema(respuesta.getTema())
+                    .tema(resultadoTema.temaFinal())
+                    .temaRespuest(respuesta.getTema())
+                    .temaIdentifi(identificacion.getTema())
                     .secuencia(identificacion.getSecuencia())
                     .totalPreguntas(respuesta.getTotalPreguntas())
                     .respuestas(respuesta.getRespuestas())
+                    .temaValido(resultadoTema.valido())
+                    .observacionTema(resultadoTema.observacion())
                     .build());
         }
 
         return resultado;
+    }
+
+    private ResultadoTema resolverTema(String temaRespuest, String temaIdentifi) {
+        String temaResp = normalizarTexto(temaRespuest);
+        String temaIden = normalizarTexto(temaIdentifi);
+
+        if (!temaResp.isBlank() && !temaIden.isBlank()) {
+            if (temaResp.equals(temaIden)) {
+                return new ResultadoTema(
+                        temaResp,
+                        true,
+                        "Tema validado correctamente en RESPUEST e IDENTIFI"
+                );
+            }
+
+            return new ResultadoTema(
+                    "",
+                    false,
+                    "Conflicto de TEMA: RESPUEST=" + temaResp + ", IDENTIFI=" + temaIden
+            );
+        }
+
+        if (!temaResp.isBlank()) {
+            return new ResultadoTema(
+                    temaResp,
+                    true,
+                    "Tema tomado desde RESPUEST"
+            );
+        }
+
+        if (!temaIden.isBlank()) {
+            return new ResultadoTema(
+                    temaIden,
+                    true,
+                    "Tema tomado desde IDENTIFI porque RESPUEST estaba vacío"
+            );
+        }
+
+        return new ResultadoTema(
+                "",
+                false,
+                "No se encontró TEMA en RESPUEST ni en IDENTIFI"
+        );
     }
 
     private String normalizarLitho(String litho) {
@@ -77,5 +140,20 @@ public class CruceIdentificacionRespuestasService {
         }
 
         return litho.trim();
+    }
+
+    private String normalizarTexto(String valor) {
+        if (valor == null) {
+            return "";
+        }
+
+        return valor.trim().toUpperCase();
+    }
+
+    private record ResultadoTema(
+            String temaFinal,
+            boolean valido,
+            String observacion
+    ) {
     }
 }
