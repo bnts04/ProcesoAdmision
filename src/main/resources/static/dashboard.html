@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Resultados de Admisión - UNICA</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>body { font-family: 'Inter', sans-serif; }</style>
+</head>
+<body class="bg-[#f4f6f9] text-gray-800 h-screen flex flex-col overflow-hidden">
+
+<header class="bg-[#002B69] text-white h-16 flex items-center justify-between px-6 border-b-4 border-[#D4A311] shrink-0">
+    <div class="flex items-center gap-3">
+        <i data-lucide="menu" class="w-6 h-6 cursor-pointer"></i>
+        <div>
+            <h1 class="text-sm font-bold uppercase tracking-wide">Universidad Nacional San Luis Gonzaga</h1>
+            <p class="text-[11px] text-gray-300 font-medium -mt-0.5">Comisión Ejecutiva Central de Admisión</p>
+        </div>
+    </div>
+    <div class="text-lg font-semibold tracking-wide">Sistema de Resultados de Admisión</div>
+    <div class="flex items-center gap-2">
+        <div class="w-10 h-10 bg-[#D4A311] rounded-tl-xl rounded-br-xl flex items-center justify-center font-bold text-xs text-blue-900 shadow-md border border-white">
+            <i data-lucide="graduation-cap" class="w-5 h-5"></i>
+        </div>
+    </div>
+</header>
+
+<div class="flex flex-1 overflow-hidden">
+
+    <aside class="w-64 bg-[#0a2540] text-gray-300 flex flex-col justify-between shrink-0">
+        <nav class="p-4 space-y-1 flex-1">
+            <button onclick="navegarModulo('carga', 'Cargar archivos')" id="btn-carga" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white/10 hover:text-white transition-colors text-left">
+                <i data-lucide="upload-cloud" class="w-5 h-5"></i> Gestión de proceso
+            </button>
+            <button onclick="navegarModulo('dashboard', 'Dashboard')" id="btn-dashboard" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-white bg-[#0052cc] font-medium transition-colors text-left">
+                <i data-lucide="layout-dashboard" class="w-5 h-5"></i> Dashboard global
+            </button>
+            <button onclick="navegarModulo('reporte', 'Reporte técnico')" id="btn-reporte" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white/10 hover:text-white transition-colors text-left">
+                <i data-lucide="bar-chart-3" class="w-5 h-5"></i> Asignación de Vacantes
+            </button>
+            <button onclick="navegarModulo('vista-previa', 'Vista previa')" id="btn-vista-previa" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white/10 hover:text-white transition-colors text-left">
+                    <i data-lucide="eye" class="w-5 h-5"></i> Resultados por Carrera
+            </button>
+            <button onclick="navegarModulo('historial', 'Historial')" id="btn-historial" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white/10 hover:text-white transition-colors text-left">
+                    <i data-lucide="history" class="w-5 h-5"></i> Historial
+            </button>
+            <button onclick="navegarModulo('anulacion', 'Anulación de examen')" id="btn-anulacion" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white/10 text-red-400 hover:text-red-300 transition-colors text-left">
+                    <i data-lucide="ban" class="w-5 h-5"></i> Anulación de examen
+            </button>
+        </nav>
+
+        <div class="p-4 border-t border-gray-700 bg-[#071e33] flex items-center gap-3">
+            <div class="w-9 h-9 rounded-full bg-gray-500 flex items-center justify-center text-white"><i data-lucide="user" class="w-5 h-5"></i></div>
+            <div class="overflow-hidden">
+                <p class="text-xs font-semibold text-white truncate">admision@unica.edu.pe</p>
+                <p class="text-[10px] text-gray-400 truncate">Comisión de Admisión</p>
+            </div>
+        </div>
+    </aside>
+
+    <main class="flex-1 p-6 overflow-y-auto">
+
+
+
+
+
+        <section id="vista-carga" class="hidden flex flex-col gap-6">
+            <div>
+                <h2 class="text-2xl font-bold text-blue-900 tracking-tight">Carga de archivos</h2>
+                <p class="text-sm text-gray-500 mt-1">Carga los archivos requeridos para el procesamiento de resultados de admisión.</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
+                </div>
+                <div class="space-y-4">
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+                        <h3 class="font-bold text-sm text-blue-900 mb-4 flex items-center gap-2"><i data-lucide="clipboard-list" class="w-4 h-4 text-blue-700"></i> Requisitos</h3>
+                        <ul class="text-xs text-gray-600 space-y-3">
+                            <li class="flex items-center gap-2"><i data-lucide="check-circle-2" class="text-green-500 w-4 h-4"></i> Formato: Excel (.xlsx)</li>
+                            <li class="flex items-center gap-2"><i data-lucide="check-circle-2" class="text-green-500 w-4 h-4"></i> Tamaño máximo por archivo: 50 MB</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between gap-4">
+                <button class="bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 text-sm font-semibold py-2.5 px-6 rounded-lg flex items-center gap-2"><i data-lucide="folder-open" class="w-4 h-4"></i> Seleccionar archivos</button>
+                <div class="flex gap-3">
+                    <button class="bg-[#0052cc] text-white text-sm font-semibold py-2.5 px-8 rounded-lg">Validar archivos</button>
+                    <button class="bg-[#d97706] text-white text-sm font-semibold py-2.5 px-8 rounded-lg">Continuar <i data-lucide="arrow-right" class="inline w-4 h-4"></i></button>
+                </div>
+            </div>
+        </section>
+
+
+
+        <section id="vista-dashboard" class="space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center gap-4">
+                    <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center shrink-0">
+                        <i data-lucide="users" class="w-6 h-6"></i>
+                    </div>
+
+                    <div>
+                        <p class="text-xs font-medium text-gray-500">Total postulantes</p>
+                        <p id="dash-total" class="text-2xl font-bold text-gray-800">0</p>
+                    </div>
+                </div>
+
+                <!-- INGRESANTES -->
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center gap-4">
+                    <div class="w-12 h-12 bg-green-50 text-green-600 rounded-full flex items-center justify-center shrink-0">
+                        <i data-lucide="check-circle" class="w-6 h-6"></i>
+                    </div>
+
+                    <div>
+                        <p class="text-xs font-medium text-gray-500">Ingresantes</p>
+                        <p id="dash-ingresantes" class="text-2xl font-bold text-gray-800">0</p>
+                    </div>
+                </div>
+
+                <!-- NO INGRESANTES -->
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center gap-4">
+                    <div class="w-12 h-12 bg-red-50 text-red-600 rounded-full flex items-center justify-center shrink-0">
+                        <i data-lucide="user-x" class="w-6 h-6"></i>
+                    </div>
+
+                    <div>
+                        <p class="text-xs font-medium text-gray-500">No ingresantes</p>
+                        <p id="dash-noingresantes" class="text-2xl font-bold text-gray-800">0</p>
+                    </div>
+                </div>
+
+                <!-- MAX PUNTAJE -->
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center gap-4">
+                    <div class="w-12 h-12 bg-amber-50 text-amber-600 rounded-full flex items-center justify-center shrink-0">
+                        <i data-lucide="trophy" class="w-6 h-6"></i>
+                    </div>
+
+                    <div>
+                        <p class="text-xs font-medium text-gray-500">Mayor puntaje</p>
+                        <p id="dash-max" class="text-2xl font-bold text-gray-800">0</p>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                <div class="p-4 bg-gray-50 border-b border-gray-100 flex justify-between items-center">
+                    <h3 class="font-bold text-sm text-blue-900">Listado preliminar de la base de datos</h3>
+                    <span class="text-xs text-gray-500 font-medium"></span>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-xs">
+                        <thead>
+                        <tr class="bg-[#002B69] text-white font-semibold">
+                            <th class="p-3 w-12 text-center">N°</th>
+                            <th class="p-3">Código</th><th class="p-3">Apellidos y Nombres</th>
+                            <th class="p-3 text-center">Puntaje</th>
+                            <th class="p-3 text-center">OME</th>
+                            <th class="p-3 text-center">OMG</th>
+                            <th class="p-3 text-center">Condición</th>
+                        </tr>
+                        </thead>
+                        <tbody id="dash-tabla-body">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </section>
+
+
+
+
+        <section id="vista-reporte" class="hidden space-y-6">
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 my-6">
+                <div class="flex justify-between items-center mb-4">
+                    <div>
+                        <h2 class="text-xl font-bold text-[#0a2540]">Configuración de Vacantes por Carrera</h2>
+                        <p class="text-sm text-gray-500">Carreras detectadas en el sistema. Ingresa la cantidad de vacantes oficiales para el proceso.</p>
+                    </div>
+                    <button onclick="guardarVacantesMasivo()" class="flex items-center gap-2 bg-[#0052cc] hover:bg-[#0041a3] text-white px-4 py-2 rounded-lg font-medium transition-colors shadow-sm">
+                        <i data-lucide="save" class="w-4 h-4"></i> Guardar Vacantes
+                    </button>
+                </div>
+
+                <div class="overflow-x-auto rounded-lg border border-gray-200">
+                    <table class="w-full text-left border-collapse bg-white">
+                        <thead>
+                        <tr class="bg-gray-50 border-b border-gray-200 text-gray-700 font-semibold text-sm">
+                            <th class="p-4">Facultad</th>
+                            <th class="p-4">Carrera Profesional</th>
+                            <th class="p-4 w-40 text-center">N° Vacantes</th>
+                        </tr>
+                        </thead>
+                        <tbody id="tabla-vacantes-body" class="divide-y divide-gray-200 text-sm text-gray-600">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+
+
+
+
+        <section id="vista-vista-previa" class="hidden space-y-6">
+            <div class="flex flex-col xl:flex-row gap-4">
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 min-w-[250px] shrink-0 flex flex-col justify-center">
+                    <p class="text-[11px] font-bold text-blue-900 uppercase tracking-wider mb-2">Seleccionar carrera</p>
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-10 h-10 bg-blue-900 text-white rounded-full flex items-center justify-center shrink-0"><span class="font-serif text-xl italic font-bold">Ψ</span></div>
+                        <div><p class="text-base font-bold text-gray-800 truncate"></p></div>
+                    </div>
+                    <select id="selector-carrera"
+                            onchange="filtrarPorCarrera()"
+                            class="w-full bg-white border border-gray-200 text-blue-600 hover:bg-blue-50 text-xs font-semibold py-2 rounded cursor-pointer">
+
+                        <option value=""> GENERAL </option>
+
+                    </select>                </div>
+                <div class="grid grid-cols-1 md:grid-cols-5 gap-3 flex-1">
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center gap-3">
+                        <div class="w-10 h-10 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center shrink-0"><i data-lucide="users" class="w-5 h-5"></i></div>
+                        <div><p class="text-[10px] font-semibold text-gray-500 uppercase">Total</p><p id="vp-total" class="text-xl font-bold text-gray-800">0</p></div>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center gap-3">
+                        <div class="w-10 h-10 bg-green-50 text-green-600 rounded-full flex items-center justify-center shrink-0"><i data-lucide="check-circle-2" class="w-5 h-5"></i></div>
+                        <div><p class="text-[10px] font-semibold text-gray-500 uppercase">Ingresantes</p><p id="vp-ingresantes" class="text-xl font-bold text-gray-800">0</p></div>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center gap-3">
+                        <div class="w-10 h-10 bg-red-50 text-red-600 rounded-full flex items-center justify-center shrink-0"><i data-lucide="user-x" class="w-5 h-5"></i></div>
+                        <div><p class="text-[10px] font-semibold text-gray-500 uppercase">No Ingresantes</p><p id="vp-noingresantes" class="text-xl font-bold text-gray-800">0</p></div>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center gap-3">
+                        <div class="w-10 h-10 bg-amber-50 text-amber-600 rounded-full flex items-center justify-center shrink-0"><i data-lucide="trophy" class="w-5 h-5"></i></div>
+                        <div><p class="text-[10px] font-semibold text-gray-500 uppercase">Max</p><p id="vp-max" class="text-xl font-bold text-gray-800">0</p></div>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center gap-3">
+                        <div class="w-10 h-10 bg-purple-50 text-purple-600 rounded-full flex items-center justify-center shrink-0"><i data-lucide="bar-chart-2" class="w-5 h-5"></i></div>
+                        <div><p class="text-[10px] font-semibold text-gray-500 uppercase">Promedio</p><p id="vp-promedio" class="text-xl font-bold text-gray-800">0</p></div>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden flex flex-col">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-xs">
+                        <thead>
+                        <tr class="bg-[#002B69] text-white font-semibold">
+                            <th class="p-3 w-12 text-center">N°</th><th>Código</th><th>Apellidos y nombres</th><th class="text-center">Puntaje</th><th class="text-center">OME</th><th class="text-center">OMG</th><th class="text-center">Condición</th>
+                        </tr>
+                        </thead>
+                        <tbody id="tabla-vista-previa"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+
+
+    </main>
+</div>
+
+<footer class="bg-[#001f3f] text-gray-400 text-xs h-10 flex items-center justify-between px-6 shrink-0 border-t border-gray-800">
+    <div><strong>Módulo activo:</strong> <span id="footer-modulo" class="text-gray-300">DASHBOARD</span></div>
+    <div class="text-gray-300"><i data-lucide="shield-check" class="inline w-4 h-4 text-green-400 mr-1"></i>Código de verificación: <strong class="text-amber-400">ADM-2025-II-0001</strong></div>
+</footer>
+
+<script src="js/navigation.js"></script>
+<script src="js/dashboard.js"></script>
+<script src="js/api.js"></script>
+<script src="js/vacantes.js"></script>
+<script src="js/main.js"></script>
+</body>
+
+</html>

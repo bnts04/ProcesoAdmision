@@ -21,7 +21,7 @@ public class ResultadoController {
     @GetMapping("/proceso/{procesoId}")
     public List<ResultadoPostulanteVistaResponse> listarResultadosPorProceso(
             @PathVariable Long procesoId,
-            @RequestParam(defaultValue = "50") Integer limite
+            @RequestParam(required = false) Integer limite
     ) {
         return resultadoConsultaService.listarResultadosPorProceso(procesoId, limite);
     }
@@ -35,8 +35,8 @@ public class ResultadoController {
     public List<ResultadoPostulanteVistaResponse> listarResultadosPorCarrera(
             @PathVariable Long procesoId,
             @RequestParam String nombre,
-            @RequestParam(defaultValue = "50") Integer limite
-    ) {
+            @RequestParam(required = false) Integer limite    )
+    {
         return resultadoConsultaService.listarResultadosPorCarrera(procesoId, nombre, limite);
     }
 
