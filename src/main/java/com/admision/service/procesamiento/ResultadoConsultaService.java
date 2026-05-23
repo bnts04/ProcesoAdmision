@@ -161,4 +161,22 @@ public class ResultadoConsultaService {
 
         return limpio;
     }
+
+    public ResultadoPostulanteVistaResponse buscarResultadoPorCodigo(Long procesoId, String codigo) {
+        if (!procesoAdmisionRepository.existsById(procesoId)) {
+            throw new RuntimeException("Proceso de admisión no encontrado");
+        }
+
+        if (codigo == null || codigo.isBlank()) {
+            throw new RuntimeException("Debe enviar el código del postulante");
+        }
+
+        ResultadoPostulante resultado = resultadoPostulanteRepository
+                .findByProcesoIdAndCodigo(procesoId, codigo.trim())
+                .orElseThrow(() -> new RuntimeException(
+                        "No se encontró postulante con código " + codigo + " en el proceso " + procesoId
+                ));
+
+        return ResultadoPostulanteVistaResponse.fromEntity(resultado, procesoId);
+    }
 }

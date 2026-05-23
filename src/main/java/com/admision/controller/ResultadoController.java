@@ -44,4 +44,11 @@ public class ResultadoController {
     public List<ResumenCarreraResponse> obtenerResumenPorCarreras(@PathVariable Long procesoId) {
         return resultadoConsultaService.obtenerResumenPorCarreras(procesoId);
     }
+    @GetMapping("/proceso/{procesoId}/codigo/{codigo}")
+    public ResultadoPostulanteVistaResponse buscarResultadoPorCodigo(
+            @PathVariable Long procesoId,
+            @PathVariable String codigo
+    ) {
+        return resultadoConsultaService.buscarResultadoPorCodigo(procesoId, codigo);
+    }
 }
