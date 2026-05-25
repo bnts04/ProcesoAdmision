@@ -1,75 +1,52 @@
-/**
- * Gestión de la navegación interna (Single Page Application)
- */
 function navegarModulo(moduloId, nombreModulo) {
-    const modulos = [
-        'dashboard',
-        'carga',
-        'procesamiento',
-        'vista-previa',
-        'pdfs',
-        'reporte',
-        'historial',
-        'anulacion'
-    ];
+    if (window.modulosBloqueados && window.modulosBloqueados.has(moduloId)) {
+        alert("Este módulo se habilita después de ejecutar el procesamiento completo.");
+        return;
+    }
+
+    const modulos = ["dashboard", "carga", "reporte", "vista-previa", "historial", "anulacion"];
 
     modulos.forEach(m => {
-        // OCULTAR SECCIONES
-        const domSec = document.getElementById(`vista-${m}`);
-        if (domSec) {
-            domSec.classList.add('hidden');
-        }
+        const sec = document.getElementById(`vista-${m}`);
+        if (sec) sec.classList.add("hidden");
 
-        // RESET BOTONES
-        const domBtn = document.getElementById(`btn-${m}`);
-        if (domBtn) {
-            domBtn.className = "w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white/10 hover:text-white transition-colors text-left";
+        const btn = document.getElementById(`btn-${m}`);
+        if (btn) {
+            btn.className = "w-full flex items-center gap-3 px-4 py-3 rounded-lg sidebar-normal transition-colors text-left";
+            if (m === "anulacion") btn.classList.add("text-red-300", "hover:text-red-200");
         }
     });
 
-    // MOSTRAR SECCIÓN ACTIVA
-    const seccionActiva = document.getElementById(`vista-${moduloId}`);
-    if (seccionActiva) {
-        seccionActiva.classList.remove('hidden');
+    const seccion = document.getElementById(`vista-${moduloId}`);
+    if (seccion) seccion.classList.remove("hidden");
+
+    const activo = document.getElementById(`btn-${moduloId}`);
+    if (activo) {
+        activo.className = "w-full flex items-center gap-3 px-4 py-3 rounded-lg sidebar-active transition-colors text-left";
     }
 
-    // BOTÓN ACTIVO
-    const btnActivo = document.getElementById(`btn-${moduloId}`);
-    if (btnActivo) {
-        btnActivo.className = "w-full flex items-center gap-3 px-4 py-3 rounded-lg text-white bg-[#0052cc] font-medium transition-colors text-left";
+    const footer = document.getElementById("footer-modulo");
+    if (footer) footer.textContent = nombreModulo.toUpperCase();
+
+    if (moduloId === "dashboard") {
+        jalarDatosDashboard();
     }
 
-    // 🌟 DISPARADORES AUTOMÁTICOS DE DATOS 🌟
-    // Evaluamos 'moduloId' (que es el parámetro real de tu función)
-    if (moduloId === 'historial') {
-        if (typeof cargarHistorial === 'function') {
-            cargarHistorial(); // 🚀 Dispara la carga automática de la BD al entrar a la vista
-        }
+    if (moduloId === "vista-previa") {
+        cargarCarreras().then(() => filtrarPorCarrera());
     }
 
-    // Aprovechamos para enganchar también tu tabla de vacantes del Proceso 1 cuando entres a 'reporte'
-    if (moduloId === 'reporte') {
-        if (typeof cargarTablaVacantesDinamica === 'function') {
-            cargarTablaVacantesDinamica(); // 🚀 Rellena la tabla de vacantes automáticamente
-        }
-    }
-// 🌟 DISPARADOR AUTOMÁTICO PARA EL MÓDULO DE ANULACIÓN 🌟
-    if (moduloId === 'anulacion') {
-        if (typeof inicializarModuloAnulacion === 'function') {
-            inicializarModuloAnulacion(); // Re-evalúa el DOM y limpia el estado del botón
-        }
-
+    if (moduloId === "reporte") {
+        cargarTablaVacantesDinamica();
     }
 
-    // Si entra al módulo de Formulario de Anulación
-    if (moduloId === 'anulacion') {
-        if (typeof inicializarModuloAnulacion === 'function') {
-            inicializarModuloAnulacion();
-        }
+    if (moduloId === "historial") {
+        cargarHistorial();
     }
-    // FOOTER
-    const domFooter = document.getElementById('footer-modulo');
-    if (domFooter) {
-        domFooter.textContent = nombreModulo.toUpperCase();
+
+    if (moduloId === "anulacion") {
+        inicializarModuloAnulacion();
     }
+
+    if (typeof lucide !== "undefined") lucide.createIcons();
 }

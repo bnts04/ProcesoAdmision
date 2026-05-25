@@ -1,172 +1,101 @@
-// ==========================================
-// CONTROL DE ANULACIONES DE POSTULANTES
-// ==========================================
-
 function inicializarModuloAnulacion() {
-    console.log("[ANULACIÓN] Sincronizando interfaz y listeners de seguridad...");
+    const fileInput = document.getElementById("anulacion-file-input");
+    const textoArchivo = document.getElementById("anulacion-texto-archivo");
+    const toggle = document.getElementById("anulacion-toggle");
+    const btn = document.getElementById("btn-submit-anulacion");
 
-    const fileInput = document.getElementById('anulacion-file-input');
-    const textoArchivo = document.getElementById('anulacion-texto-archivo');
-    const toggleAnulacion = document.getElementById('anulacion-toggle');
-    const btnSubmit = document.getElementById('btn-submit-anulacion');
-
-    // Estado inicial del botón según el interruptor
-    if (btnSubmit) {
-        if (toggleAnulacion && toggleAnulacion.checked) {
-            btnSubmit.disabled = false;
-            btnSubmit.classList.remove('opacity-50', 'cursor-not-allowed');
-        } else {
-            btnSubmit.disabled = true;
-            btnSubmit.classList.add('opacity-50', 'cursor-not-allowed');
-        }
-    }
-
-    // Listener del Interruptor de Confirmación
-    if (toggleAnulacion && btnSubmit) {
-        toggleAnulacion.onchange = (e) => {
-            if (e.target.checked) {
-                console.log("[ANULACIÓN] Acción confirmada por el usuario. Botón desbloqueado.");
-                btnSubmit.disabled = false;
-                btnSubmit.classList.remove('opacity-50', 'cursor-not-allowed');
-            } else {
-                btnSubmit.disabled = true;
-                btnSubmit.classList.add('opacity-50', 'cursor-not-allowed');
-            }
+    if (btn && toggle) {
+        btn.disabled = !toggle.checked;
+        toggle.onchange = () => {
+            btn.disabled = !toggle.checked;
         };
     }
 
-    // Listener de carga de archivos (Input File)
     if (fileInput && textoArchivo) {
         fileInput.onchange = (e) => {
             if (e.target.files.length > 0) {
-                const file = e.target.files[0];
-                console.log(`[ANULACIÓN] Archivo cargado listo: ${file.name}`);
-                textoArchivo.textContent = `📄 ${file.name}`;
-                textoArchivo.className = "text-sm font-bold text-green-600 animate-pulse";
+                textoArchivo.textContent = `📄 ${e.target.files[0].name}`;
+                textoArchivo.className = "text-sm font-bold text-green-600";
             } else {
                 textoArchivo.textContent = "Arrastre o seleccione archivo";
                 textoArchivo.className = "text-sm font-bold text-[#0052cc]";
             }
         };
     }
-
-    // Listener de envío del formulario
-    if (btnSubmit) {
-        btnSubmit.onclick = function(e) {
-            e.preventDefault();
-            ejecutarAnulacionFormulario();
-        };
-    }
 }
 
-function cargarAnulaciones() {
-    console.log("[ANULACIÓN] Inicializando vista de control...");
-    inicializarModuloAnulacion();
-}
+const formAnulacion = document.getElementById("form-anulacion");
 
-function ejecutarAnulacionFormulario() {
-    const procesoId = localStorage.getItem('procesoActivoId');
+if (formAnulacion) {
+    formAnulacion.addEventListener("submit", async function (e) {
+        e.preventDefault();
 
-    if (!procesoId) {
-        alert("No hay ningún proceso activo seleccionado en la sesión.");
-        return;
-    }
+        const procesoId = getProcesoIdActual();
 
-    const inputCodigo = document.getElementById('anulacion-codigo');
-    const inputMotivo = document.getElementById('anulacion-motivo');
-    const inputEvidencia = document.getElementById('anulacion-file-input');
-    const inputObservacion = document.getElementById('anulacion-observacion');
-    const toggleConfirmacion = document.getElementById('anulacion-toggle');
-    const btnSubmit = document.getElementById('btn-submit-anulacion');
+        if (!procesoId) {
+            alert("No hay proceso activo seleccionado.");
+            return;
+        }
 
-    if (!inputCodigo || !inputCodigo.value.trim()) {
-        alert("Por favor, ingresa el código del postulante.");
-        inputCodigo.focus();
-        return;
-    }
+        const codigo = document.getElementById("anulacion-codigo").value.trim();
+        const motivo = document.getElementById("anulacion-motivo").value;
+        const observacion = document.getElementById("anulacion-observacion").value.trim();
+        const evidencia = document.getElementById("anulacion-file-input").files[0];
+        const toggle = document.getElementById("anulacion-toggle");
 
-    if (!inputMotivo || !inputMotivo.value) {
-        alert("Por favor, seleccione un motivo principal de la lista.");
-        inputMotivo.focus();
-        return;
-    }
+        if (!codigo) {
+            alert("Ingresa el código del postulante.");
+            return;
+        }
 
-    if (!inputEvidencia || inputEvidencia.files.length === 0) {
-        alert("Es obligatorio adjuntar un archivo (Foto o Acta) como evidencia del incidente.");
-        return;
-    }
+        if (!motivo) {
+            alert("Selecciona un motivo.");
+            return;
+        }
 
-    if (!toggleConfirmacion || !toggleConfirmacion.checked) {
-        alert("Debe activar el interruptor de 'Confirmar anulación' antes de ejecutar esta acción.");
-        return;
-    }
+        if (!evidencia) {
+            alert("Adjunta evidencia.");
+            return;
+        }
 
-    let motivoFinal = inputMotivo.value;
-    if (inputObservacion && inputObservacion.value.trim()) {
-        motivoFinal += ` - Detalle: ${inputObservacion.value.trim()}`;
-    }
+        if (!toggle.checked) {
+            alert("Debes confirmar la anulación.");
+            return;
+        }
 
-    // Construcción del empaquetado binario Multipart
-    const formData = new FormData();
-    formData.append('procesoId', parseInt(procesoId));
-    formData.append('codigo', inputCodigo.value.trim());
-    formData.append('motivo', motivoFinal);
-    console.log(`[ANULACIÓN] Despachando FormData a Spring Boot para Postulante: ${inputCodigo.value.trim()}`);
+        const formData = new FormData();
+        formData.append("procesoId", procesoId);
+        formData.append("codigo", codigo);
+        formData.append("motivo", observacion ? `${motivo} - Detalle: ${observacion}` : motivo);
+        formData.append("evidencia", evidencia);
 
-    if (btnSubmit) {
-        btnSubmit.disabled = true;
-        btnSubmit.innerHTML = `<i data-lucide="loader" class="w-5 h-5 animate-spin"></i> Procesando...`;
-        if (typeof lucide !== 'undefined') lucide.createIcons();
-    }
+        try {
+            const res = await fetch(`${API_BASE}/api/anulaciones-postulante`, {
+                method: "POST",
+                body: formData
+            });
 
-    fetch('http://localhost:8080/api/anulaciones-postulante', {
-        method: 'POST',
-        body: formData
-    })
-        .then(res => {
             if (!res.ok) {
-                return res.text().then(text => { throw new Error(text || `Error del servidor (${res.status})`) });
-            }
-            return res.json();
-        })
-        .then(data => {
-            console.log("[ANULACIÓN] Servidor respondió con éxito:", data);
-            alert(`¡Operación exitosa! El examen del postulante con código ${inputCodigo.value.trim()} ha sido anulado correctamente.`);
-
-            // Reset del Formulario
-            const form = document.getElementById('form-anulacion');
-            if (form) form.reset();
-            if (toggleConfirmacion) toggleConfirmacion.checked = false;
-
-            const textoArchivo = document.getElementById('anulacion-texto-archivo');
-            if (textoArchivo) {
-                textoArchivo.textContent = "Arrastre o seleccione archivo";
-                textoArchivo.className = "text-sm font-bold text-[#0052cc]";
+                const text = await res.text();
+                throw new Error(text || "Error anulando postulante.");
             }
 
-            // Refrescar Dashboard y saltar de vista
-            if (typeof jalarDatosDashboard === 'function') jalarDatosDashboard();
-            if (typeof navegarModulo === 'function') navegarModulo('dashboard', 'Dashboard global');
-        })
-        .catch(error => {
-            console.error("[ANULACIÓN] Error devuelto por Spring Boot:", error);
-            alert(`No se pudo registrar la anulación. Verifique que el código exista en la base de datos para este proceso.`);
-        })
-        .finally(() => {
-            if (btnSubmit) {
-                btnSubmit.disabled = false;
-                btnSubmit.innerHTML = `<i data-lucide="file-warning" class="w-5 h-5"></i> Ejecutar Anulación`;
-                if (typeof lucide !== 'undefined') lucide.createIcons();
-                inicializarModuloAnulacion();
+            const data = await res.json();
+
+            alert(data.mensaje || "Postulante anulado correctamente.");
+
+            formAnulacion.reset();
+            inicializarModuloAnulacion();
+
+            await jalarDatosDashboard();
+
+            if (window.estadoProcesoActual && window.estadoProcesoActual.mostrarDashboard) {
+                navegarModulo("dashboard", "Dashboard global");
             }
-        });
-}
 
-// Registro Global
-window.inicializarModuloAnulacion = inicializarModuloAnulacion;
-window.cargarAnulaciones = cargarAnulaciones;
-
-// Auto-disparo preventivo al cargar el script
-if (document.readyState === "complete" || document.readyState === "interactive") {
-    inicializarModuloAnulacion();
+        } catch (error) {
+            console.error("Error anulando postulante:", error);
+            alert("No se pudo registrar la anulación: " + error.message);
+        }
+    });
 }

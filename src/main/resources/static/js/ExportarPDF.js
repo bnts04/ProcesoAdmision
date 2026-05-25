@@ -1,61 +1,56 @@
+async function generarPdfGeneral() {
+    const procesoId = getProcesoIdActual();
 
-
-const BASE_URL_PDF = "http://localhost:8080/api/pdf";
-
-// 1. CONSOLIDADO GENERAL PDF (Abre en pestaña nueva para visualizar/imprimir)
-function exportarConsolidadoGeneral() {
-    console.log("Solicitando la generación del PDF General...");
-
-    fetch(`${BASE_URL_PDF}/proceso/1/general`, {
-        method: 'POST'
-    })
-        .then(res => {
-            if (!res.ok) throw new Error("Error al generar el PDF en el servidor");
-            return res.json();
-        })
-        .then(data => {
-            // Usamos 'urlVer' para que se abra elegantemente en otra pestaña
-            // Si prefieres que se descargue directo sin ver, cambia 'urlVer' por 'urlDescargar'
-            if (data.urlVer) {
-                window.open(data.urlVer, '_blank');
-            } else {
-                alert("El servidor no proporcionó la URL del archivo.");
-            }
-        })
-        .catch(error => {
-            console.error("Error:", error);
-            alert("Hubo un error al procesar el Consolidado General.");
-        });
-}
-
-// 2. REPORTE POR ESCUELA PDF (Abre en pestaña nueva filtrado por la carrera actual)
-function exportarReportePorEscuela() {
-    const carrera = document.getElementById("selector-carrera").value;
-
-    if (carrera === "") {
-        alert("Por favor, selecciona una carrera/escuela específica. Para todo junto, usa el Consolidado General.");
+    if (!procesoId) {
+        alert("Primero debes crear o seleccionar un proceso.");
         return;
     }
 
-    console.log(`Solicitando generación de PDF para: ${carrera}...`);
-
-    fetch(`${BASE_URL_PDF}/proceso/1/carrera?nombre=${encodeURIComponent(carrera)}`, {
-        method: 'POST'
-    })
-        .then(res => {
-            if (!res.ok) throw new Error("Error al generar el PDF de la carrera");
-            return res.json();
-        })
-        .then(data => {
-            // Al igual que el anterior, abrimos directo en pestaña nueva usando la respuesta del backend
-            if (data.urlVer) {
-                window.open(data.urlVer, '_blank');
-            } else {
-                alert("El servidor no proporcionó la URL del archivo.");
-            }
-        })
-        .catch(error => {
-            console.error("Error:", error);
-            alert("Hubo un error al procesar el reporte de la escuela.");
+    try {
+        const data = await fetchJson(`${API_BASE}/api/pdf/proceso/${procesoId}/general`, {
+            method: "POST"
         });
+
+        alert(data.mensaje || "PDF generado correctamente.");
+
+        if (data.urlVer) window.open(data.urlVer, "_blank");
+
+        await cargarHistorial();
+
+    } catch (error) {
+        console.error("Error generando PDF general:", error);
+        alert("No se pudo generar el PDF general: " + error.message);
+    }
+}
+
+async function generarPdfPorCarrera() {
+    const procesoId = getProcesoIdActual();
+    const selector = document.getElementById("selector-carrera");
+    const carrera = selector ? selector.value : "";
+
+    if (!procesoId) {
+        alert("Primero debes crear o seleccionar un proceso.");
+        return;
+    }
+
+    if (!carrera) {
+        alert("Selecciona una carrera para generar el PDF individual. Para todo el proceso usa PDF general.");
+        return;
+    }
+
+    try {
+        const data = await fetchJson(`${API_BASE}/api/pdf/proceso/${procesoId}/carrera?nombre=${encodeURIComponent(carrera)}`, {
+            method: "POST"
+        });
+
+        alert(data.mensaje || "PDF de carrera generado correctamente.");
+
+        if (data.urlVer) window.open(data.urlVer, "_blank");
+
+        await cargarHistorial();
+
+    } catch (error) {
+        console.error("Error generando PDF por carrera:", error);
+        alert("No se pudo generar el PDF por carrera: " + error.message);
+    }
 }
