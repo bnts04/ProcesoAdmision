@@ -5,4 +5,5 @@ public enum CondicionPostulante {
     INGRESO,
     NO_INGRESO,
     ANULADO
+
 }

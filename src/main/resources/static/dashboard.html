@@ -41,13 +41,13 @@
                 <i data-lucide="bar-chart-3" class="w-5 h-5"></i> Asignación de Vacantes
             </button>
             <button onclick="navegarModulo('vista-previa', 'Vista previa')" id="btn-vista-previa" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white/10 hover:text-white transition-colors text-left">
-                    <i data-lucide="eye" class="w-5 h-5"></i> Resultados por Carrera
+                <i data-lucide="eye" class="w-5 h-5"></i> Resultados por Carrera
             </button>
             <button onclick="navegarModulo('historial', 'Historial')" id="btn-historial" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white/10 hover:text-white transition-colors text-left">
-                    <i data-lucide="history" class="w-5 h-5"></i> Historial
+                <i data-lucide="history" class="w-5 h-5"></i> Historial
             </button>
             <button onclick="navegarModulo('anulacion', 'Anulación de examen')" id="btn-anulacion" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white/10 text-red-400 hover:text-red-300 transition-colors text-left">
-                    <i data-lucide="ban" class="w-5 h-5"></i> Anulación de examen
+                <i data-lucide="ban" class="w-5 h-5"></i> Anulación de examen
             </button>
         </nav>
 
@@ -65,30 +65,172 @@
 
 
 
-
         <section id="vista-carga" class="hidden flex flex-col gap-6">
             <div>
-                <h2 class="text-2xl font-bold text-blue-900 tracking-tight">Carga de archivos</h2>
-                <p class="text-sm text-gray-500 mt-1">Carga los archivos requeridos para el procesamiento de resultados de admisión.</p>
+                <h2 class="text-2xl font-bold text-blue-900 tracking-tight">Gestión de proceso</h2>
+                <p class="text-sm text-gray-500 mt-1">Crea un nuevo proceso de admisión y gestiona la carga de archivos requeridos.</p>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
+
+            <div class="flex flex-col xl:flex-row gap-6 w-full">
+
+                <div class="bg-white p-8 rounded-xl shadow-sm border border-gray-100 flex-1">
+                    <h3 class="font-bold text-sm text-blue-900 mb-6 uppercase tracking-wide border-b pb-3 flex items-center gap-2">
+                        <i data-lucide="folder-plus" class="w-5 h-5 text-blue-700"></i> CREAR NUEVO PROCESO
+                    </h3>
+
+                    <form id="form-proceso" class="space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
+                            <label class="block text-sm font-semibold text-gray-600 uppercase md:text-right">Nombre del Proceso:</label>
+                            <div class="md:col-span-2">
+                                <input type="text" id="input-nombre-proceso" placeholder="Ej. Admisión 2026-I" class="w-full bg-white border border-gray-300 text-gray-800 text-sm rounded-lg focus:ring-[#0052cc] focus:border-[#0052cc] block p-2.5 outline-none transition-all shadow-sm">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
+                            <label class="block text-sm font-semibold text-gray-600 uppercase md:text-right">Modalidad:</label>
+                            <div class="md:col-span-2 flex flex-wrap gap-3">
+                                <button type="button" class="px-5 py-2 text-sm font-semibold rounded-full bg-[#0052cc] text-white shadow-md transition-colors modal-pill active" data-modalidad="ordinario">
+                                    ORDINARIO
+                                </button>
+                                <button type="button" class="px-5 py-2 text-sm font-semibold rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors modal-pill" data-modalidad="extraordinario">
+                                    EXTRAORDINARIO
+                                </button>
+                                <button type="button" class="px-5 py-2 text-sm font-semibold rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors modal-pill" data-modalidad="cepu">
+                                    CEPU
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-gray-50 p-5 rounded-xl border border-gray-200">
+
+                            <div id="card-file-postulantes" class="bg-white border border-gray-300 rounded-lg p-3 flex items-center justify-between shadow-sm transition-all duration-300">
+                                <div class="flex items-center gap-3 overflow-hidden">
+                                    <div id="icon-container-postulantes" class="w-9 h-9 bg-blue-50 text-blue-600 rounded-lg flex items-center justify-center shrink-0">
+                                        <i data-lucide="database" class="w-5 h-5"></i>
+                                    </div>
+                                    <div class="flex flex-col truncate">
+                                        <span class="text-sm font-medium text-gray-800">Datos Postulantes</span>
+                                        <span id="txt-file-postulantes" class="text-xs text-gray-400 block truncate">Seleccionar archivo (IDENTIFI.dbf)...</span>
+                                    </div>
+                                </div>
+                                <input type="file" id="file-postulantes" accept=".dbf" class="hidden" onchange="evaluarArchivoSeleccionado('file-postulantes', 'txt-file-postulantes', 'card-file-postulantes', 'icon-container-postulantes')">
+                                <label for="file-postulantes" class="text-xs font-semibold text-[#0052cc] hover:underline shrink-0 ml-2 cursor-pointer select-none">
+                                    Seleccionar
+                                </label>
+                            </div>
+
+                            <div id="card-file-claves" class="bg-white border border-gray-300 rounded-lg p-3 flex items-center justify-between shadow-sm transition-all duration-300">
+                                <div class="flex items-center gap-3 overflow-hidden">
+                                    <div id="icon-container-claves" class="w-9 h-9 bg-blue-50 text-blue-600 rounded-lg flex items-center justify-center shrink-0">
+                                        <i data-lucide="database" class="w-5 h-5"></i>
+                                    </div>
+                                    <div class="flex flex-col truncate">
+                                        <span class="text-sm font-medium text-gray-800">Claves Correctas</span>
+                                        <span id="txt-file-claves" class="text-xs text-gray-400 block truncate">Seleccionar archivo (CLAVES.dbf)...</span>
+                                    </div>
+                                </div>
+                                <input type="file" id="file-claves" accept=".dbf" class="hidden" onchange="evaluarArchivoSeleccionado('file-claves', 'txt-file-claves', 'card-file-claves', 'icon-container-claves')">
+                                <label for="file-claves" class="text-xs font-semibold text-[#0052cc] hover:underline shrink-0 ml-2 cursor-pointer select-none">
+                                    Seleccionar
+                                </label>
+                            </div>
+
+                            <div id="card-file-respuestas" class="bg-white border border-gray-300 rounded-lg p-3 flex items-center justify-between shadow-sm transition-all duration-300">
+                                <div class="flex items-center gap-3 overflow-hidden">
+                                    <div id="icon-container-respuestas" class="w-9 h-9 bg-blue-50 text-blue-600 rounded-lg flex items-center justify-center shrink-0">
+                                        <i data-lucide="database" class="w-5 h-5"></i>
+                                    </div>
+                                    <div class="flex flex-col truncate">
+                                        <span class="text-sm font-medium text-gray-800">Hoja de Respuestas</span>
+                                        <span id="txt-file-respuestas" class="text-xs text-gray-400 block truncate">Seleccionar archivo (RESPUEST.dbf)...</span>
+                                    </div>
+                                </div>
+                                <input type="file" id="file-respuestas" accept=".dbf" class="hidden" onchange="evaluarArchivoSeleccionado('file-respuestas', 'txt-file-respuestas', 'card-file-respuestas', 'icon-container-respuestas')">
+                                <label for="file-respuestas" class="text-xs font-semibold text-[#0052cc] hover:underline shrink-0 ml-2 cursor-pointer select-none">
+                                    Seleccionar
+                                </label>
+                            </div>
+
+                            <div id="card-file-requisito" class="bg-white border border-gray-300 rounded-lg p-3 flex items-center justify-between shadow-sm transition-all duration-300">
+                                <div class="flex items-center gap-3 overflow-hidden">
+                                    <div id="icon-container-requisito" class="w-9 h-9 bg-red-50 text-red-600 rounded-lg flex items-center justify-center shrink-0">
+                                        <i data-lucide="file-text" class="w-5 h-5"></i>
+                                    </div>
+                                    <div class="flex flex-col truncate">
+                                        <span class="text-sm font-medium text-gray-800">Documento Técnico Requerido</span>
+                                        <span id="txt-file-requisito" class="text-xs text-gray-400 block truncate">Seleccionar archivo (.pdf)...</span>
+                                    </div>
+                                </div>
+                                <input type="file" id="file-requisito" accept=".pdf" class="hidden" onchange="evaluarArchivoSeleccionado('file-requisito', 'txt-file-requisito', 'card-file-requisito', 'icon-container-requisito')">
+                                <label for="file-requisito" class="text-xs font-semibold text-[#0052cc] hover:underline shrink-0 ml-2 cursor-pointer select-none">
+                                    Seleccionar
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-center pt-4">
+                            <button type="submit" class="w-full max-w-sm bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold py-3 px-8 rounded-xl transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 tracking-wide uppercase">
+                                <i data-lucide="plus-circle" class="w-5 h-5"></i> Crear Proceso
+                            </button>
+                        </div>
+                    </form>
                 </div>
-                <div class="space-y-4">
+
+                <div class="w-full xl:w-80 shrink-0 space-y-6">
                     <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
-                        <h3 class="font-bold text-sm text-blue-900 mb-4 flex items-center gap-2"><i data-lucide="clipboard-list" class="w-4 h-4 text-blue-700"></i> Requisitos</h3>
+                        <h3 class="font-bold text-sm text-blue-900 mb-4 flex items-center gap-2 border-b border-gray-100 pb-2">
+                            <i data-lucide="clipboard-list" class="w-4 h-4 text-blue-700"></i> Requisitos
+                        </h3>
                         <ul class="text-xs text-gray-600 space-y-3">
-                            <li class="flex items-center gap-2"><i data-lucide="check-circle-2" class="text-green-500 w-4 h-4"></i> Formato: Excel (.xlsx)</li>
-                            <li class="flex items-center gap-2"><i data-lucide="check-circle-2" class="text-green-500 w-4 h-4"></i> Tamaño máximo por archivo: 50 MB</li>
+                            <li class="flex items-center gap-2"><i data-lucide="check-circle-2" class="text-green-500 w-4 h-4 shrink-0"></i> Archivos de datos en formato <strong>.DBF</strong></li>
+                            <li class="flex items-center gap-2"><i data-lucide="check-circle-2" class="text-green-500 w-4 h-4 shrink-0"></i> Documento técnico en formato <strong>.PDF</strong></li>
+                            <li class="flex items-center gap-2"><i data-lucide="check-circle-2" class="text-green-500 w-4 h-4 shrink-0"></i> Tamaño máximo por archivo: 50 MB</li>
                         </ul>
                     </div>
+
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+                        <h3 class="font-bold text-sm text-blue-900 mb-4 flex items-center gap-2 border-b border-gray-100 pb-2">
+                            <i data-lucide="list-checks" class="w-4 h-4 text-blue-700"></i> Campos esperados (DBF)
+                        </h3>
+                        <div class="space-y-4 text-xs">
+                            <div>
+                                <p class="font-semibold text-gray-700 mb-2">Base de Postulantes:</p>
+                                <div class="flex flex-wrap gap-1.5">
+                                    <span class="bg-gray-100 text-gray-600 border border-gray-200 px-2 py-1 rounded font-mono tracking-tight">CODIGO</span>
+                                    <span class="bg-gray-100 text-gray-600 border border-gray-200 px-2 py-1 rounded font-mono tracking-tight">NOMBRES</span>
+                                    <span class="bg-gray-100 text-gray-600 border border-gray-200 px-2 py-1 rounded font-mono tracking-tight">MODALIDAD</span>
+                                </div>
+                            </div>
+                            <div>
+                                <p class="font-semibold text-gray-700 mb-2">Hoja de Respuestas:</p>
+                                <div class="flex flex-wrap gap-1.5">
+                                    <span class="bg-gray-100 text-gray-600 border border-gray-200 px-2 py-1 rounded font-mono tracking-tight">CODIGO</span>
+                                    <span class="bg-gray-100 text-gray-600 border border-gray-200 px-2 py-1 rounded font-mono tracking-tight">TIPO_EXAM</span>
+                                    <span class="bg-gray-100 text-gray-600 border border-gray-200 px-2 py-1 rounded font-mono tracking-tight">RESPUESTAS</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
+
             </div>
-            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between gap-4">
-                <button class="bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 text-sm font-semibold py-2.5 px-6 rounded-lg flex items-center gap-2"><i data-lucide="folder-open" class="w-4 h-4"></i> Seleccionar archivos</button>
-                <div class="flex gap-3">
-                    <button class="bg-[#0052cc] text-white text-sm font-semibold py-2.5 px-8 rounded-lg">Validar archivos</button>
-                    <button class="bg-[#d97706] text-white text-sm font-semibold py-2.5 px-8 rounded-lg">Continuar <i data-lucide="arrow-right" class="inline w-4 h-4"></i></button>
+            <div id="modal-exito" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+                <div class="absolute inset-0 bg-gray-900/60 backdrop-blur-sm"></div>
+
+                <div class="bg-white rounded-2xl shadow-xl border border-gray-100 max-w-md w-full p-6 relative z-10 transform scale-95 opacity-0 transition-all duration-300 ease-out flex flex-col items-center text-center">
+
+                    <div class="w-16 h-16 bg-green-50 text-green-500 rounded-full flex items-center justify-center mb-4 ring-8 ring-green-50/50">
+                        <i data-lucide="check-circle-2" class="w-10 h-10"></i>
+                    </div>
+
+                    <h3 class="text-xl font-bold text-gray-900 tracking-tight">¡Proceso Creado con Éxito!</h3>
+                    <p class="text-sm text-gray-500 mt-2 leading-relaxed">
+                        El proceso de admisión ha sido registrado de forma correcta. Los archivos binarios fueron cargados y validados por el sistema.
+                    </p>
+
+                    <button id="btn-cerrar-modal" type="button" class="mt-6 w-full bg-gray-900 hover:bg-gray-800 text-white text-sm font-semibold py-3 px-6 rounded-xl transition-colors shadow-md">
+                        Entendido
+                    </button>
                 </div>
             </div>
         </section>
@@ -206,23 +348,28 @@
 
 
 
-
         <section id="vista-vista-previa" class="hidden space-y-6">
+
             <div class="flex flex-col xl:flex-row gap-4">
-                <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 min-w-[250px] shrink-0 flex flex-col justify-center">
-                    <p class="text-[11px] font-bold text-blue-900 uppercase tracking-wider mb-2">Seleccionar carrera</p>
+
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 min-w-[280px] shrink-0 flex flex-col justify-center">
+                    <p class="text-[11px] font-bold text-blue-900 uppercase tracking-wider mb-2">Seleccionar carrera profesional</p>
                     <div class="flex items-center gap-3 mb-3">
-                        <div class="w-10 h-10 bg-blue-900 text-white rounded-full flex items-center justify-center shrink-0"><span class="font-serif text-xl italic font-bold">Ψ</span></div>
-                        <div><p class="text-base font-bold text-gray-800 truncate"></p></div>
+                        <div class="w-10 h-10 bg-[#002B69] text-white rounded-full flex items-center justify-center shrink-0 shadow-sm">
+                            <span class="font-serif text-xl italic font-bold">Ψ</span>
+                        </div>
+                        <div>
+                            <p id="titulo-carrera-activa" class="text-xs font-bold text-gray-700 truncate max-w-[180px]">Resultados Generales</p>
+                        </div>
                     </div>
                     <select id="selector-carrera"
                             onchange="filtrarPorCarrera()"
-                            class="w-full bg-white border border-gray-200 text-blue-600 hover:bg-blue-50 text-xs font-semibold py-2 rounded cursor-pointer">
-
+                            class="w-full bg-white border border-gray-200 text-blue-600 hover:bg-blue-50 text-xs font-semibold py-2 px-2 rounded cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
                         <option value=""> GENERAL </option>
+                    </select>
+                </div>
 
-                    </select>                </div>
-                <div class="grid grid-cols-1 md:grid-cols-5 gap-3 flex-1">
+                <div class="grid grid-cols-2 md:grid-cols-5 gap-3 flex-1">
                     <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center gap-3">
                         <div class="w-10 h-10 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center shrink-0"><i data-lucide="users" class="w-5 h-5"></i></div>
                         <div><p class="text-[10px] font-semibold text-gray-500 uppercase">Total</p><p id="vp-total" class="text-xl font-bold text-gray-800">0</p></div>
@@ -239,26 +386,253 @@
                         <div class="w-10 h-10 bg-amber-50 text-amber-600 rounded-full flex items-center justify-center shrink-0"><i data-lucide="trophy" class="w-5 h-5"></i></div>
                         <div><p class="text-[10px] font-semibold text-gray-500 uppercase">Max</p><p id="vp-max" class="text-xl font-bold text-gray-800">0</p></div>
                     </div>
-                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center gap-3">
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center gap-3 col-span-2 md:col-span-1">
                         <div class="w-10 h-10 bg-purple-50 text-purple-600 rounded-full flex items-center justify-center shrink-0"><i data-lucide="bar-chart-2" class="w-5 h-5"></i></div>
                         <div><p class="text-[10px] font-semibold text-gray-500 uppercase">Promedio</p><p id="vp-promedio" class="text-xl font-bold text-gray-800">0</p></div>
                     </div>
                 </div>
             </div>
+
+            <div class="flex flex-col lg:flex-row items-stretch lg:items-center justify-between bg-white p-4 rounded-xl shadow-sm border border-gray-100 gap-4">
+                <div class="flex items-center gap-3 text-xs text-gray-600 bg-blue-50 px-4 py-2.5 rounded-lg border border-blue-100 flex-1">
+                    <i data-lucide="info" class="w-4 h-4 text-blue-600 shrink-0"></i>
+                    <p>Esta es una vista previa analítica de resultados. Por favor verifique las vacantes asignadas en el <strong class="text-blue-900">Reporte Técnico</strong> antes de realizar impresiones definitivas.</p>
+                </div>
+
+                <div class="flex flex-wrap items-center gap-2 shrink-0">
+                    <button onclick="navegarModulo('reporte', 'Reporte técnico')" class="bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 text-xs font-semibold py-2.5 px-4 rounded-lg flex items-center justify-center gap-2 transition-colors shadow-sm">
+                        <i data-lucide="arrow-left" class="w-4 h-4"></i> Ajustar Vacantes
+                    </button>
+
+                    <button onclick="exportarConsolidadoGeneral()" class="bg-red-600 hover:bg-red-700 text-white text-xs font-semibold py-2.5 px-4 rounded-lg flex items-center justify-center gap-2 transition-colors shadow-sm">
+                        <i data-lucide="file-text" class="w-4 h-4"></i> Consolidado General PDF
+                    </button>
+
+                    <button onclick="exportarReportePorEscuela()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold py-2.5 px-4 rounded-lg flex items-center justify-center gap-2 transition-colors shadow-sm">
+                        <i data-lucide="graduation-cap" class="w-4 h-4"></i> Reporte por Escuela PDF
+                    </button>
+                </div>
+            </div>
+
             <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden flex flex-col">
+                <div class="p-3 bg-gray-50 border-b border-gray-100 flex justify-between items-center">
+                    <h3 class="font-bold text-xs text-blue-900 uppercase tracking-wider flex items-center gap-2">
+                        <i data-lucide="list-ordered" class="w-4 h-4 text-[#D4A311]"></i>
+                        Cuadro Oficial de Orden de Mérito
+                    </h3>
+                </div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse text-xs">
                         <thead>
                         <tr class="bg-[#002B69] text-white font-semibold">
-                            <th class="p-3 w-12 text-center">N°</th><th>Código</th><th>Apellidos y nombres</th><th class="text-center">Puntaje</th><th class="text-center">OME</th><th class="text-center">OMG</th><th class="text-center">Condición</th>
+                            <th class="p-3 w-12 text-center">N°</th>
+                            <th class="p-3">Código</th>
+                            <th class="p-3">Apellidos y nombres</th>
+                            <th class="p-3 text-center">Puntaje Final</th>
+                            <th class="p-3 text-center">OME (Carrera)</th>
+                            <th class="p-3 text-center">OMG (General)</th>
+                            <th class="p-3 text-center">Condición Final</th>
                         </tr>
                         </thead>
-                        <tbody id="tabla-vista-previa"></tbody>
+                        <tbody id="tabla-vista-previa" class="divide-y divide-gray-100 text-gray-700 bg-white">
+                        </tbody>
                     </table>
                 </div>
             </div>
         </section>
 
+
+
+
+
+        <section id="vista-historial" class="hidden flex flex-col gap-6">
+
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6">
+                    <h3 class="font-bold text-lg text-[#002B69] flex items-center gap-2">
+                        <i data-lucide="history" class="w-5 h-5 text-blue-600"></i> Historial de procesos
+                    </h3>
+
+                    <div class="flex flex-wrap items-end gap-4">
+                        <div>
+                            <label class="block text-[11px] font-bold text-gray-500 uppercase mb-1">Rango de fechas</label>
+                            <div class="flex items-center bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-700 shadow-sm">
+                                <input type="text" placeholder="01/11/2025" class="bg-transparent outline-none w-20 text-center">
+                                <span class="text-gray-400 px-2">-</span>
+                                <input type="text" placeholder="28/12/2025" class="bg-transparent outline-none w-20 text-center">
+                                <i data-lucide="calendar" class="w-4 h-4 text-gray-400 ml-2"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-bold text-gray-500 uppercase mb-1">Estado</label>
+                            <select class="bg-white border border-gray-200 text-gray-700 text-sm rounded-lg shadow-sm focus:ring-[#0052cc] block w-32 p-2 outline-none cursor-pointer">
+                                <option value="todos">Todos</option>
+                                <option value="completado">Completado</option>
+                                <option value="anulado">Anulado</option>
+                            </select>
+                        </div>
+                        <button class="bg-white border border-gray-200 text-[#0052cc] hover:bg-blue-50 text-sm font-semibold py-2 px-4 rounded-lg flex items-center gap-2 transition-colors shadow-sm">
+                            <i data-lucide="filter-x" class="w-4 h-4"></i> Limpiar filtros
+                        </button>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto rounded-lg border border-gray-200">
+                    <table class="w-full text-left border-collapse text-sm">
+                        <thead>
+                        <tr class="bg-[#002B69] text-white font-semibold text-xs tracking-wide">
+                            <th class="p-3">Proceso</th>
+                            <th class="p-3 text-center">Fecha</th>
+                            <th class="p-3 text-center">Archivos usados</th>
+                            <th class="p-3 text-center">Total postulantes</th>
+                            <th class="p-3 text-center">Estado</th>
+                            <th class="p-3 text-center">Acciones</th>
+                        </tr>
+                        </thead>
+                        <tbody id="tabla-historial-body">
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="mt-4 flex flex-col sm:flex-row items-center justify-between text-xs text-gray-500 gap-4">
+                    <p>Mostrando 1 a 5 de 15 resultados</p>
+                    <div class="flex items-center gap-1">
+                        <button class="w-7 h-7 flex items-center justify-center rounded border border-gray-200 text-blue-500 hover:bg-blue-50 bg-white"><i data-lucide="chevrons-left" class="w-3.5 h-3.5"></i></button>
+                        <button class="w-7 h-7 flex items-center justify-center rounded border border-gray-200 text-blue-500 hover:bg-blue-50 bg-white"><i data-lucide="chevron-left" class="w-3.5 h-3.5"></i></button>
+                        <button class="w-7 h-7 flex items-center justify-center rounded border border-[#0052cc] bg-[#0052cc] text-white font-bold">1</button>
+                        <button class="w-7 h-7 flex items-center justify-center rounded border border-gray-200 hover:bg-gray-50 text-blue-500 bg-white">2</button>
+                        <button class="w-7 h-7 flex items-center justify-center rounded border border-gray-200 hover:bg-gray-50 text-blue-500 bg-white">3</button>
+                        <button class="w-7 h-7 flex items-center justify-center rounded border border-gray-200 text-blue-500 hover:bg-blue-50 bg-white"><i data-lucide="chevron-right" class="w-3.5 h-3.5"></i></button>
+                        <button class="w-7 h-7 flex items-center justify-center rounded border border-gray-200 text-blue-500 hover:bg-blue-50 bg-white"><i data-lucide="chevrons-right" class="w-3.5 h-3.5"></i></button>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span>Resultados por página:</span>
+                        <select class="bg-white border border-gray-200 rounded p-1 outline-none font-semibold text-gray-700 cursor-pointer">
+                            <option>5</option>
+                            <option>10</option>
+                            <option>20</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+
+
+
+        <section id="vista-anulacion" class="hidden flex flex-col gap-6 min-h-[calc(100vh-9.5rem)]">
+            <div class="grid grid-cols-1 xl:grid-cols-3 gap-6 flex-1">
+
+                <div class="xl:col-span-2 bg-white p-8 rounded-xl shadow-sm border border-red-200 flex flex-col h-full">
+
+                    <div class="flex items-center gap-2 mb-6 border-b border-gray-100 pb-3 shrink-0">
+                        <i data-lucide="ban" class="w-6 h-6 text-red-500"></i>
+                        <h3 class="font-bold text-xl text-red-500">Anulación de examen</h3>
+                    </div>
+
+                    <form id="form-anulacion" class="flex-1 flex flex-col gap-6">
+
+                        <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 bg-red-50/50 p-4 rounded-lg border border-red-100 shrink-0">
+                            <div class="w-full md:w-1/2">
+                                <label class="block text-xs font-bold text-gray-700 mb-1">Código del postulante <span class="text-red-500">*</span></label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                        <i data-lucide="search" class="w-4 h-4 text-gray-400"></i>
+                                    </div>
+                                    <input type="text" id="anulacion-codigo" name="codigo" placeholder="Ej. 73578639" class="w-full bg-white border border-gray-300 text-gray-900 text-sm font-semibold rounded-lg focus:ring-red-500 focus:border-red-500 block pl-10 p-2.5 outline-none shadow-sm">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 flex-1">
+
+                            <div class="flex flex-col gap-5 h-full">
+                                <div class="shrink-0">
+                                    <label class="block text-xs font-semibold text-gray-600 mb-1">Motivo principal <span class="text-red-500">*</span></label>
+                                    <select id="anulacion-motivo" name="motivo" class="w-full bg-white border border-gray-300 text-gray-700 text-sm rounded-lg focus:ring-red-500 focus:border-red-500 p-3 outline-none shadow-sm cursor-pointer">
+                                        <option value="">Seleccione un motivo...</option>
+                                        <option value="Irregularidad detectada durante el examen">Irregularidad detectada durante el examen</option>
+                                        <option value="Falla técnica masiva">Falla técnica masiva</option>
+                                        <option value="Indicios de fraude">Indicios de fraude</option>
+                                    </select>
+                                </div>
+
+                                <div class="flex-1 flex flex-col">
+                                    <label class="block text-xs font-semibold text-gray-600 mb-1">Evidencia (Foto o Acta) <span class="text-red-500">*</span></label>
+                                    <div id="anulacion-zona-archivo" class="flex-1 border-2 border-dashed border-blue-300 bg-blue-50/40 rounded-lg p-6 flex flex-col items-center justify-center text-center hover:bg-blue-50 transition-colors cursor-pointer group relative min-h-[150px]">
+                                        <i data-lucide="upload-cloud" class="w-10 h-10 text-blue-400 group-hover:text-[#0052cc] mb-3 transition-colors"></i>
+                                        <p id="anulacion-texto-archivo" class="text-sm font-bold text-[#0052cc]">Arrastre o seleccione archivo</p>
+                                        <p class="text-xs text-gray-500 mt-2">JPG, PNG o PDF (máx. 10 MB)</p>
+                                        <input type="file" id="anulacion-file-input" name="evidencia" accept=".jpg,.jpeg,.png,.pdf" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flex flex-col gap-5 h-full">
+                                <div class="flex-1 flex flex-col">
+                                    <label class="block text-xs font-semibold text-gray-600 mb-1">Observación detallada (Opcional)</label>
+                                    <textarea id="anulacion-observacion" name="observacion" placeholder="Detalle adicional sobre el incidente..." class="flex-1 w-full bg-white border border-gray-300 text-gray-700 text-sm rounded-lg focus:ring-red-500 focus:border-red-500 p-3 outline-none resize-none shadow-sm min-h-[150px]"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+
+                    <div class="mt-8 pt-6 border-t border-gray-100 flex justify-between items-center shrink-0">
+                        <div class="flex items-center gap-4">
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input id="anulacion-toggle" type="checkbox" class="sr-only peer">
+                                <div class="w-11 h-6 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600 shadow-inner"></div>
+                            </label>
+                            <span class="text-sm font-bold text-gray-800">Confirmar anulación</span>
+                        </div>
+                        <button id="btn-submit-anulacion" form="form-anulacion" type="submit" class="bg-[#cc292b] hover:bg-red-700 text-white text-base font-semibold py-3 px-8 rounded-xl transition-colors shadow-md flex items-center gap-2">
+                            <i data-lucide="file-warning" class="w-5 h-5"></i> Ejecutar Anulación
+                        </button>
+                    </div>
+                </div>
+
+                <div class="bg-[#FFFDF5] p-8 rounded-xl border border-amber-200 shadow-sm flex flex-col h-full justify-between">
+                    <div>
+                        <h4 class="font-bold text-[#d97706] text-lg flex items-center gap-2 mb-4">
+                            <i data-lucide="info" class="w-6 h-6"></i> Nota importante
+                        </h4>
+                        <p class="text-sm text-gray-700 leading-relaxed mb-8">
+                            Al confirmar esta acción, los resultados del postulante indicado serán invalidados permanentemente para el proceso actual.
+                        </p>
+                    </div>
+
+                    <div class="flex-1 flex flex-col justify-center gap-8 mb-8">
+                        <div class="flex items-center justify-between bg-white border border-gray-100 rounded-xl p-4 shadow-sm">
+                            <div class="flex flex-col items-center gap-2 text-center w-28">
+                                <div class="p-3 border border-blue-100 rounded-lg bg-blue-50"><i data-lucide="user-check" class="w-8 h-8 text-[#002B69]"></i></div>
+                                <span class="text-[10px] font-bold text-[#002B69] leading-tight">Postulante<br>Regular</span>
+                            </div>
+                            <div class="flex-1 flex items-center justify-center relative px-2">
+                                <div class="w-full border-t-2 border-dashed border-gray-300"></div>
+                                <i data-lucide="ban" class="w-6 h-6 text-red-500 absolute bg-white px-1"></i>
+                            </div>
+                            <div class="flex flex-col items-center gap-2 text-center w-28">
+                                <div class="p-3 border border-red-100 rounded-lg bg-red-50"><i data-lucide="user-x" class="w-8 h-8 text-[#cc292b]"></i></div>
+                                <span class="text-[10px] font-bold text-[#cc292b] leading-tight">Examen<br>Anulado</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white border border-amber-100 rounded-xl p-5 shadow-sm shrink-0">
+                        <p class="text-xs font-bold text-amber-800 mb-3 flex items-center gap-2">
+                            <i data-lucide="shield-alert" class="w-4 h-4"></i> Requisitos obligatorios:
+                        </p>
+                        <ul class="text-xs text-gray-600 space-y-2 list-disc pl-5">
+                            <li>Ingresar el código exacto del alumno.</li>
+                            <li>Adjuntar el acta firmada o captura (evidencia).</li>
+                            <li>Activar el interruptor de confirmación.</li>
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+        </section>
 
 
     </main>
@@ -269,11 +643,18 @@
     <div class="text-gray-300"><i data-lucide="shield-check" class="inline w-4 h-4 text-green-400 mr-1"></i>Código de verificación: <strong class="text-amber-400">ADM-2025-II-0001</strong></div>
 </footer>
 
-<script src="js/navigation.js"></script>
-<script src="js/dashboard.js"></script>
 <script src="js/api.js"></script>
+<script src="js/CrearProceso.js"></script>
+<script src="js/navigation.js"></script>
 <script src="js/vacantes.js"></script>
+
+<script src="js/dashboard.js"></script>
+<script src="js/cargarArchivos.js"></script>
+<script src="js/ExportarPDF.js"></script>
+<script src="js/Anulacion.js"></script>
+<script src="js/Historial.js"></script>
 <script src="js/main.js"></script>
+
 </body>
 
 </html>
