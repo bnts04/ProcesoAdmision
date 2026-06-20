@@ -4,6 +4,7 @@ import com.admision.enums.EstadoProceso;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -41,6 +42,22 @@ public class ProcesoAdmision {
     @Column(name = "codigo_verificacion", length = 50)
     private String codigoVerificacion;
 
+    @Builder.Default
+    @Column(name = "puntaje_correcta", precision = 10, scale = 4, nullable = false, columnDefinition = "numeric(10,4) default 20.0000")
+    private BigDecimal puntajeCorrecta = new BigDecimal("20.0000");
+
+    @Builder.Default
+    @Column(name = "puntaje_incorrecta", precision = 10, scale = 4, nullable = false, columnDefinition = "numeric(10,4) default -1.2500")
+    private BigDecimal puntajeIncorrecta = new BigDecimal("-1.2500");
+
+    @Builder.Default
+    @Column(name = "puntaje_blanca", precision = 10, scale = 4, nullable = false, columnDefinition = "numeric(10,4) default 1.2500")
+    private BigDecimal puntajeBlanca = new BigDecimal("1.2500");
+
+    @Builder.Default
+    @Column(name = "factor_escala", precision = 10, scale = 4, nullable = false, columnDefinition = "numeric(10,4) default 100.0000")
+    private BigDecimal factorEscala = new BigDecimal("100.0000");
+
     @Column(name = "fecha_creacion", nullable = false)
     private LocalDateTime fechaCreacion;
 
@@ -67,10 +84,42 @@ public class ProcesoAdmision {
         if (this.totalNoIngresantes == null) {
             this.totalNoIngresantes = 0;
         }
+
+        if (this.puntajeCorrecta == null) {
+            this.puntajeCorrecta = new BigDecimal("20.0000");
+        }
+
+        if (this.puntajeIncorrecta == null) {
+            this.puntajeIncorrecta = new BigDecimal("-1.2500");
+        }
+
+        if (this.puntajeBlanca == null) {
+            this.puntajeBlanca = new BigDecimal("1.2500");
+        }
+
+        if (this.factorEscala == null) {
+            this.factorEscala = new BigDecimal("100.0000");
+        }
     }
 
     @PreUpdate
     public void preUpdate() {
         this.fechaActualizacion = LocalDateTime.now();
+
+        if (this.puntajeCorrecta == null) {
+            this.puntajeCorrecta = new BigDecimal("20.0000");
+        }
+
+        if (this.puntajeIncorrecta == null) {
+            this.puntajeIncorrecta = new BigDecimal("-1.2500");
+        }
+
+        if (this.puntajeBlanca == null) {
+            this.puntajeBlanca = new BigDecimal("1.2500");
+        }
+
+        if (this.factorEscala == null) {
+            this.factorEscala = new BigDecimal("100.0000");
+        }
     }
 }

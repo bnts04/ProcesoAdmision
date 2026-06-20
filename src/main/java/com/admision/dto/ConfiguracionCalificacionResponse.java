@@ -1,6 +1,7 @@
 package com.admision.dto;
 
-import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -8,13 +9,17 @@ import java.math.BigDecimal;
 
 @Getter
 @Setter
-public class CrearProcesoRequest {
+@Builder
+@AllArgsConstructor
+public class ConfiguracionCalificacionResponse {
 
-    @NotBlank(message = "El nombre del proceso es obligatorio")
+    private Long procesoId;
+
     private String nombreProceso;
 
-    @NotBlank(message = "La modalidad es obligatoria")
     private String modalidad;
+
+    private String estadoProceso;
 
     private BigDecimal puntajeCorrecta;
 
@@ -23,4 +28,6 @@ public class CrearProcesoRequest {
     private BigDecimal puntajeBlanca;
 
     private BigDecimal factorEscala;
+
+    private String mensaje;
 }

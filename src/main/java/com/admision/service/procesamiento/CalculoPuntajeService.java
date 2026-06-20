@@ -3,6 +3,8 @@ package com.admision.service.procesamiento;
 import com.admision.dto.ClaveTemaResponse;
 import com.admision.dto.PostulanteConRespuestasResponse;
 import com.admision.dto.PuntajePostulanteResponse;
+import com.admision.entity.ProcesoAdmision;
+import com.admision.repository.ProcesoAdmisionRepository;
 import com.admision.service.excel.ClavesExcelService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,13 +21,19 @@ public class CalculoPuntajeService {
 
     private final ClavesExcelService clavesExcelService;
     private final CruceIdentificacionRespuestasService cruceIdentificacionRespuestasService;
+    private final ProcesoAdmisionRepository procesoAdmisionRepository;
 
-    private static final BigDecimal PUNTAJE_CORRECTA = new BigDecimal("20.00");
-    private static final BigDecimal PUNTAJE_INCORRECTA = new BigDecimal("-1.25");
-    private static final BigDecimal PUNTAJE_BLANCA = new BigDecimal("1.25");
-    private static final BigDecimal FACTOR_ESCALA = new BigDecimal("100");
+    private static final BigDecimal DEFAULT_PUNTAJE_CORRECTA = new BigDecimal("20.0000");
+    private static final BigDecimal DEFAULT_PUNTAJE_INCORRECTA = new BigDecimal("-1.2500");
+    private static final BigDecimal DEFAULT_PUNTAJE_BLANCA = new BigDecimal("1.2500");
+    private static final BigDecimal DEFAULT_FACTOR_ESCALA = new BigDecimal("100.0000");
 
     public List<PuntajePostulanteResponse> calcularPuntajes(Long procesoId, Integer limite) {
+
+        ProcesoAdmision proceso = procesoAdmisionRepository.findById(procesoId)
+                .orElseThrow(() -> new RuntimeException("Proceso de admisión no encontrado"));
+
+        ConfiguracionPuntaje configuracion = obtenerConfiguracionPuntaje(proceso);
 
         List<ClaveTemaResponse> claves = clavesExcelService.leerClaves(procesoId);
 
@@ -43,13 +51,14 @@ public class CalculoPuntajeService {
                 cruceIdentificacionRespuestasService.cruzarRespuestasConIdentificacion(procesoId, limite);
 
         return postulantes.stream()
-                .map(postulante -> calcularPuntajePostulante(postulante, clavesPorTema))
+                .map(postulante -> calcularPuntajePostulante(postulante, clavesPorTema, configuracion))
                 .toList();
     }
 
     private PuntajePostulanteResponse calcularPuntajePostulante(
             PostulanteConRespuestasResponse postulante,
-            Map<String, ClaveTemaResponse> clavesPorTema
+            Map<String, ClaveTemaResponse> clavesPorTema,
+            ConfiguracionPuntaje configuracion
     ) {
         String temaNormalizado = normalizarTexto(postulante.getTema());
 
@@ -111,9 +120,15 @@ public class CalculoPuntajeService {
             }
         }
 
-        BigDecimal puntajeBruto = calcularPuntajeBruto(correctas, incorrectas, blancas);
+        BigDecimal puntajeBruto = calcularPuntajeBruto(
+                correctas,
+                incorrectas,
+                blancas,
+                configuracion
+        );
+
         BigDecimal puntajeFinal = puntajeBruto
-                .divide(FACTOR_ESCALA, 4, RoundingMode.HALF_UP);
+                .divide(configuracion.getFactorEscala(), 4, RoundingMode.HALF_UP);
 
         return PuntajePostulanteResponse.builder()
                 .codigo(postulante.getCodigo())
@@ -126,19 +141,75 @@ public class CalculoPuntajeService {
                 .puntajeBruto(puntajeBruto)
                 .puntajeFinal(puntajeFinal)
                 .puntajeCalculado(true)
-                .observacion("Puntaje calculado correctamente")
+                .observacion(
+                        "Puntaje calculado correctamente | Configuración usada: correcta="
+                                + configuracion.getPuntajeCorrecta()
+                                + ", incorrecta="
+                                + configuracion.getPuntajeIncorrecta()
+                                + ", blanca="
+                                + configuracion.getPuntajeBlanca()
+                                + ", factor="
+                                + configuracion.getFactorEscala()
+                )
                 .build();
     }
 
-    private BigDecimal calcularPuntajeBruto(int correctas, int incorrectas, int blancas) {
-        BigDecimal totalCorrectas = PUNTAJE_CORRECTA.multiply(BigDecimal.valueOf(correctas));
-        BigDecimal totalIncorrectas = PUNTAJE_INCORRECTA.multiply(BigDecimal.valueOf(incorrectas));
-        BigDecimal totalBlancas = PUNTAJE_BLANCA.multiply(BigDecimal.valueOf(blancas));
+    private BigDecimal calcularPuntajeBruto(
+            int correctas,
+            int incorrectas,
+            int blancas,
+            ConfiguracionPuntaje configuracion
+    ) {
+        BigDecimal totalCorrectas = configuracion.getPuntajeCorrecta()
+                .multiply(BigDecimal.valueOf(correctas));
+
+        BigDecimal totalIncorrectas = configuracion.getPuntajeIncorrecta()
+                .multiply(BigDecimal.valueOf(incorrectas));
+
+        BigDecimal totalBlancas = configuracion.getPuntajeBlanca()
+                .multiply(BigDecimal.valueOf(blancas));
 
         return totalCorrectas
                 .add(totalIncorrectas)
                 .add(totalBlancas)
-                .setScale(2, RoundingMode.HALF_UP);
+                .setScale(4, RoundingMode.HALF_UP);
+    }
+
+    private ConfiguracionPuntaje obtenerConfiguracionPuntaje(ProcesoAdmision proceso) {
+        BigDecimal puntajeCorrecta = valorODefecto(
+                proceso.getPuntajeCorrecta(),
+                DEFAULT_PUNTAJE_CORRECTA
+        );
+
+        BigDecimal puntajeIncorrecta = valorODefecto(
+                proceso.getPuntajeIncorrecta(),
+                DEFAULT_PUNTAJE_INCORRECTA
+        );
+
+        BigDecimal puntajeBlanca = valorODefecto(
+                proceso.getPuntajeBlanca(),
+                DEFAULT_PUNTAJE_BLANCA
+        );
+
+        BigDecimal factorEscala = valorODefecto(
+                proceso.getFactorEscala(),
+                DEFAULT_FACTOR_ESCALA
+        );
+
+        if (factorEscala.compareTo(BigDecimal.ZERO) <= 0) {
+            factorEscala = DEFAULT_FACTOR_ESCALA;
+        }
+
+        return new ConfiguracionPuntaje(
+                puntajeCorrecta,
+                puntajeIncorrecta,
+                puntajeBlanca,
+                factorEscala
+        );
+    }
+
+    private BigDecimal valorODefecto(BigDecimal valor, BigDecimal defecto) {
+        return valor != null ? valor : defecto;
     }
 
     private String normalizarTexto(String valor) {
@@ -151,5 +222,41 @@ public class CalculoPuntajeService {
 
     private boolean esRespuestaBlanca(String respuesta) {
         return respuesta == null || respuesta.isBlank();
+    }
+
+    private static class ConfiguracionPuntaje {
+
+        private final BigDecimal puntajeCorrecta;
+        private final BigDecimal puntajeIncorrecta;
+        private final BigDecimal puntajeBlanca;
+        private final BigDecimal factorEscala;
+
+        public ConfiguracionPuntaje(
+                BigDecimal puntajeCorrecta,
+                BigDecimal puntajeIncorrecta,
+                BigDecimal puntajeBlanca,
+                BigDecimal factorEscala
+        ) {
+            this.puntajeCorrecta = puntajeCorrecta;
+            this.puntajeIncorrecta = puntajeIncorrecta;
+            this.puntajeBlanca = puntajeBlanca;
+            this.factorEscala = factorEscala;
+        }
+
+        public BigDecimal getPuntajeCorrecta() {
+            return puntajeCorrecta;
+        }
+
+        public BigDecimal getPuntajeIncorrecta() {
+            return puntajeIncorrecta;
+        }
+
+        public BigDecimal getPuntajeBlanca() {
+            return puntajeBlanca;
+        }
+
+        public BigDecimal getFactorEscala() {
+            return factorEscala;
+        }
     }
 }

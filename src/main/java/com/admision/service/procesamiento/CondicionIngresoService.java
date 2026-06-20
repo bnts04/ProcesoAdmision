@@ -4,11 +4,13 @@ import com.admision.dto.CondicionIngresoResponse;
 import com.admision.entity.CarreraVacante;
 import com.admision.entity.ProcesoAdmision;
 import com.admision.entity.ResultadoPostulante;
+import com.admision.entity.VacanteProceso;
 import com.admision.enums.CondicionPostulante;
 import com.admision.enums.EstadoProceso;
 import com.admision.repository.CarreraVacanteRepository;
 import com.admision.repository.ProcesoAdmisionRepository;
 import com.admision.repository.ResultadoPostulanteRepository;
+import com.admision.repository.VacanteProcesoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +26,7 @@ public class CondicionIngresoService {
 
     private final ResultadoPostulanteRepository resultadoPostulanteRepository;
     private final CarreraVacanteRepository carreraVacanteRepository;
+    private final VacanteProcesoRepository vacanteProcesoRepository;
     private final ProcesoAdmisionRepository procesoAdmisionRepository;
 
     @Transactional
@@ -50,9 +53,9 @@ public class CondicionIngresoService {
 
         validarOrdenMeritoCalculado(resultados);
 
-        List<CarreraVacante> vacantesActivas = carreraVacanteRepository.findByActivoTrueOrderByFacultadAscCarreraAsc();
+        List<VacanteProceso> vacantesProceso = obtenerVacantesDelProceso(proceso);
 
-        Map<String, CarreraVacante> vacantePorCarrera = vacantesActivas.stream()
+        Map<String, VacanteProceso> vacantePorCarrera = vacantesProceso.stream()
                 .collect(Collectors.toMap(
                         v -> normalizarTexto(v.getCarrera()),
                         v -> v,
@@ -73,7 +76,7 @@ public class CondicionIngresoService {
             String carreraNormalizada = entry.getKey();
             List<ResultadoPostulante> grupoCarrera = entry.getValue();
 
-            CarreraVacante vacante = vacantePorCarrera.get(carreraNormalizada);
+            VacanteProceso vacante = vacantePorCarrera.get(carreraNormalizada);
 
             if (vacante == null) {
                 carrerasSinVacantes.add(grupoCarrera.get(0).getCarrera());
@@ -82,7 +85,7 @@ public class CondicionIngresoService {
                     resultado.setCondicion(CondicionPostulante.PENDIENTE);
                     resultado.setObservacion(agregarObservacion(
                             resultado.getObservacion(),
-                            "No se encontraron vacantes configuradas para la carrera"
+                            "No se encontraron vacantes configuradas para la carrera en este proceso"
                     ));
                 }
 
@@ -118,7 +121,7 @@ public class CondicionIngresoService {
 
                 resultado.setObservacion(agregarObservacion(
                         resultado.getObservacion(),
-                        "Condición de ingreso calculada correctamente"
+                        "Condición de ingreso calculada con vacantes del proceso"
                 ));
             }
 
@@ -154,9 +157,36 @@ public class CondicionIngresoService {
                 .ingresantesAdicionalesPorEmpate(ingresantesAdicionalesPorEmpate)
                 .carrerasSinVacantesDetalle(carrerasSinVacantes)
                 .mensaje(carrerasSinVacantes.isEmpty()
-                        ? "Condición de ingreso calculada correctamente"
-                        : "Condición calculada con advertencias: existen carreras sin vacantes configuradas")
+                        ? "Condición de ingreso calculada correctamente con vacantes del proceso"
+                        : "Condición calculada con advertencias: existen carreras sin vacantes configuradas en este proceso")
                 .build();
+    }
+
+    private List<VacanteProceso> obtenerVacantesDelProceso(ProcesoAdmision proceso) {
+        List<VacanteProceso> vacantesProceso = vacanteProcesoRepository
+                .findByProcesoIdOrderByFacultadAscCarreraAsc(proceso.getId());
+
+        if (!vacantesProceso.isEmpty()) {
+            return vacantesProceso;
+        }
+
+        List<CarreraVacante> vacantesGlobales = carreraVacanteRepository
+                .findByActivoTrueOrderByFacultadAscCarreraAsc();
+
+        if (vacantesGlobales.isEmpty()) {
+            throw new RuntimeException("No existen vacantes globales configuradas.");
+        }
+
+        List<VacanteProceso> nuevasVacantes = vacantesGlobales.stream()
+                .map(vacanteGlobal -> VacanteProceso.builder()
+                        .proceso(proceso)
+                        .facultad(vacanteGlobal.getFacultad())
+                        .carrera(vacanteGlobal.getCarrera())
+                        .vacantes(vacanteGlobal.getVacantes())
+                        .build())
+                .toList();
+
+        return vacanteProcesoRepository.saveAll(nuevasVacantes);
     }
 
     private void validarOrdenMeritoCalculado(List<ResultadoPostulante> resultados) {

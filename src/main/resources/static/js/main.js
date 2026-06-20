@@ -123,12 +123,6 @@ function desbloquearModulosProcesados() {
     setBotonBloqueado("btn-historial", false);
 }
 
-/*
- * IMPORTANTE:
- * Para la demostración, el botón Procesar Todo NO dependerá de puedeProcesar.
- * Si hay proceso seleccionado, se deja presionar.
- * El backend se encargará de validar si faltan archivos.
- */
 function actualizarBotonProcesar(data) {
     const btn = document.getElementById("btn-procesar-todo");
 
@@ -157,6 +151,19 @@ async function verificarEstadoProcesoActual({ navegar = true } = {}) {
         bloquearModulosHastaProcesar();
         actualizarBotonProcesar(null);
         actualizarResumenVistaPrevia(null);
+
+        if (typeof actualizarModoCreacionProceso === "function") {
+            actualizarModoCreacionProceso(false);
+        }
+
+        if (typeof restaurarCalificacionDefecto === "function") {
+            restaurarCalificacionDefecto();
+        }
+
+        if (typeof limpiarVacantesProcesoUI === "function") {
+            limpiarVacantesProcesoUI();
+        }
+
         mostrarMensajeCarga("No hay proceso seleccionado. Crea un proceso nuevo para continuar.", "info");
 
         if (navegar && typeof navegarModulo === "function") {
@@ -171,8 +178,20 @@ async function verificarEstadoProcesoActual({ navegar = true } = {}) {
 
         window.estadoProcesoActual = data;
 
+        if (typeof actualizarModoCreacionProceso === "function") {
+            actualizarModoCreacionProceso(true);
+        }
+
         actualizarResumenVistaPrevia(data);
         actualizarBotonProcesar(data);
+
+        if (typeof cargarConfiguracionCalificacionProcesoActual === "function") {
+            await cargarConfiguracionCalificacionProcesoActual(false);
+        }
+
+        if (typeof cargarVacantesProcesoActual === "function") {
+            await cargarVacantesProcesoActual(false);
+        }
 
         if (data.mostrarDashboard === true || data.dbfProcesados === true) {
             desbloquearModulosProcesados();
@@ -190,10 +209,11 @@ async function verificarEstadoProcesoActual({ navegar = true } = {}) {
 
         } else {
             bloquearModulosHastaProcesar();
+            actualizarBotonProcesar(data);
 
             mostrarMensajeCarga(
                 data.mensaje || "Proceso creado. Pendiente de ejecutar procesamiento completo.",
-                "info"
+                data.puedeProcesar ? "warn" : "info"
             );
 
             if (navegar && typeof navegarModulo === "function") {
@@ -208,6 +228,10 @@ async function verificarEstadoProcesoActual({ navegar = true } = {}) {
 
         bloquearModulosHastaProcesar();
         actualizarBotonProcesar(null);
+
+        if (typeof limpiarVacantesProcesoUI === "function") {
+            limpiarVacantesProcesoUI("No se pudieron cargar las vacantes del proceso.");
+        }
 
         mostrarMensajeCarga(
             "El proceso existe, pero todavía falta cargar o validar archivos DBF.",
@@ -230,9 +254,9 @@ async function ejecutarProcesamientoCompletoActual() {
         return;
     }
 
-    try {
-        const btn = document.getElementById("btn-procesar-todo");
+    const btn = document.getElementById("btn-procesar-todo");
 
+    try {
         if (btn) {
             btn.disabled = true;
             btn.classList.add("opacity-40", "cursor-not-allowed");
@@ -246,10 +270,7 @@ async function ejecutarProcesamientoCompletoActual() {
             }
         }
 
-        mostrarMensajeCarga(
-            "Ejecutando procesamiento completo. Espere unos segundos...",
-            "warn"
-        );
+        mostrarMensajeCarga("Ejecutando procesamiento completo. Espere unos segundos...", "warn");
 
         const data = await fetchJson(`${API_BASE}/api/procesamiento/proceso/${procesoId}/ejecutar-todo`, {
             method: "POST"
@@ -281,8 +302,6 @@ async function ejecutarProcesamientoCompletoActual() {
         await verificarEstadoProcesoActual({ navegar: true });
 
     } finally {
-        const btn = document.getElementById("btn-procesar-todo");
-
         if (btn) {
             btn.innerHTML = `
                 <i data-lucide="play-circle" class="w-4 h-4"></i>
@@ -314,10 +333,19 @@ function limpiarProcesoActualUI() {
     bloquearModulosHastaProcesar();
     actualizarBotonProcesar(null);
 
-    mostrarMensajeCarga(
-        "Selección limpiada. Crea un proceso nuevo para continuar.",
-        "info"
-    );
+    if (typeof actualizarModoCreacionProceso === "function") {
+        actualizarModoCreacionProceso(false);
+    }
+
+    if (typeof restaurarCalificacionDefecto === "function") {
+        restaurarCalificacionDefecto();
+    }
+
+    if (typeof limpiarVacantesProcesoUI === "function") {
+        limpiarVacantesProcesoUI();
+    }
+
+    mostrarMensajeCarga("Selección limpiada. Crea un proceso nuevo para continuar.", "info");
 
     if (typeof navegarModulo === "function") {
         navegarModulo("carga", "Gestión de proceso");
