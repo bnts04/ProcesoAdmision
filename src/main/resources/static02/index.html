@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SGEA - Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+
+<body class="bg-slate-50 flex h-screen overflow-hidden text-slate-800">
+<div id="toastContainer" class="fixed top-5 right-5 z-50 space-y-3 pointer-events-none"></div>
+<aside id="sidebar"
+       class="w-64 bg-[#0A1931] text-white flex flex-col hidden md:flex absolute md:relative z-50 h-full transition-all duration-300">
+    <div class="h-16 flex items-center px-4 border-b border-white/10">
+        <div class="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center font-bold mr-3 shadow-lg">UN
+        </div>
+        <span class="font-semibold text-xs tracking-wider uppercase">Univ. San Luis Gonzaga</span>
+    </div>
+    <nav class="flex-1 py-4 px-3 space-y-1 overflow-y-auto">
+        <a href="index.html"
+           class="flex items-center px-3 py-2.5 bg-blue-600 text-white rounded-lg group font-medium text-sm transition-colors">
+            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
+            </svg>
+            Dashboard
+        </a>
+        <a href="editarPregunta.html"
+           class="flex items-center px-3 py-2.5 text-slate-300 hover:bg-white/10 hover:text-white rounded-lg group font-medium text-sm transition-colors">
+            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M4 7v10c0 2 1.5 3 3.5 3 2 0 3.5-1 3.5-3V7c0-2-1.5-3-3.5-3S4 5 4 7zm10.5-3C12.5 4 11 5 11 7v10c0 2 1.5 3 3.5 3 2 0 3.5-1 3.5-3V7c0-2-1.5-3-3.5-3z">
+                </path>
+            </svg>
+            Banco de preguntas
+        </a>
+        <a href="registrarPregunta.html"
+           class="flex items-center px-3 py-2.5 text-slate-300 hover:bg-white/10 hover:text-white rounded-lg group font-medium text-sm transition-colors">
+            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            </svg>
+            Registrar pregunta
+        </a>
+        <a href="generarExamen.html"
+           class="flex items-center px-3 py-2.5 text-slate-300 hover:bg-white/10 hover:text-white rounded-lg group font-medium text-sm transition-colors">
+            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2">
+                </path>
+            </svg>
+            Generar examen
+        </a>
+        <a href="vistaPrevia.html"
+           class="flex items-center px-3 py-2.5 text-slate-300 hover:bg-white/10 hover:text-white rounded-lg group font-medium text-sm transition-colors">
+            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
+                </path>
+            </svg>
+            Vista previa del examen
+        </a>
+        <a href="historialExamen.html"
+           class="flex items-center px-3 py-2.5 text-slate-300 hover:bg-white/10 hover:text-white rounded-lg group font-medium text-sm transition-colors">
+            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            Historial de exámenes
+        </a>
+    </nav>
+</aside>
+
+<main class="flex-1 flex flex-col h-screen overflow-hidden">
+
+    <header class="h-16 bg-[#0A1931] flex items-center justify-end px-6 border-b border-white/10">
+        <div class="flex items-center space-x-4">
+            <button class="relative text-slate-300 hover:text-white">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9">
+                    </path>
+                </svg>
+                <span class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
+            </button>
+            <div class="flex items-center space-x-2 text-white">
+                <div class="w-8 h-8 bg-slate-300 rounded-full"></div>
+                <span class="text-sm font-medium">Administrador</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="flex-1 overflow-y-auto p-8">
+
+        <div class="mb-8">
+            <h1 class="text-2xl font-bold text-[#0A1931]">Dashboard del banco de preguntas</h1>
+            <p class="text-slate-500 text-sm mt-1">Visualiza el total de preguntas registradas por cada componente
+                del examen de admisión.</p>
+        </div>
+
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
+
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+                <h3 class="text-blue-600 font-semibold text-sm mb-3">CTA</h3>
+                <div class="flex justify-between items-end">
+                    <div>
+                        <p class="text-3xl font-bold text-slate-800" id="kpi-cta-count">30</p>
+                        <p class="text-xs text-slate-500">preguntas</p>
+                    </div>
+                    <div class="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center text-blue-600">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path
+                                    d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z">
+                            </path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+                <h3 class="text-slate-800 font-semibold text-sm mb-3">Total banco</h3>
+                <div class="flex justify-between items-end">
+                    <div>
+                        <p class="text-3xl font-bold text-slate-800" id="kpi-total-count">170</p>
+                        <p class="text-xs text-slate-500">preguntas</p>
+                    </div>
+                    <div class="w-8 h-8 rounded-full bg-green-50 flex items-center justify-center text-green-600">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v14l-5-2.5L5 18V4z"></path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col">
+                <div class="p-4 border-b border-slate-100 flex items-center space-x-2">
+                    <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
+                    </svg>
+                    <h2 class="text-[#0A1931] font-semibold">Resumen por componente</h2>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm text-left">
+                        <thead class="text-xs text-slate-700 bg-slate-50 border-b border-slate-100">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 font-semibold">Componente</th>
+                            <th scope="col" class="px-6 py-3 font-semibold text-center">Preguntas en BD</th>
+                            <th scope="col" class="px-6 py-3 font-semibold text-center">Acción</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr class="bg-white border-b border-slate-100 hover:bg-slate-50">
+                            <td class="px-6 py-4 font-medium text-slate-900">CTA</td>
+                            <td class="px-6 py-4 text-center">30</td>
+                            <td class="px-6 py-4 text-center">
+                                <button
+                                        class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium px-3 py-1.5 rounded-lg transition-colors">
+                                    Ver detalle
+                                </button>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div
+                        class="p-4 bg-slate-50 text-xs text-slate-500 mt-auto border-t border-slate-100 flex items-start">
+                    <svg class="w-4 h-4 mr-2 text-blue-500 shrink-0" fill="none" stroke="currentColor"
+                         viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <p>Los totales por componente se muestran primero. Para revisar el detalle por subcurso, utiliza
+                        el botón "Ver detalle".</p>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <div class="bg-white rounded-xl shadow-sm border border-blue-200 overflow-hidden">
+                    <div
+                            class="p-4 bg-blue-50 border-b border-blue-100 flex justify-between items-center cursor-pointer">
+                        <div class="flex items-center space-x-2 text-blue-800 font-semibold text-sm">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253">
+                                </path>
+                            </svg>
+                            <span>Detalle por subcurso: Matemática</span>
+                        </div>
+                        <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7">
+                            </path>
+                        </svg>
+                    </div>
+                    <div class="p-0">
+                        <table class="w-full text-sm">
+                            <tbody>
+                            <tr class="border-b border-slate-100">
+                                <td class="px-4 py-2 text-slate-600">Trigonometría</td>
+                                <td class="px-4 py-2 text-right text-slate-800">8</td>
+                            </tr>
+                            <tr class="border-b border-slate-100">
+                                <td class="px-4 py-2 text-slate-600">Geometría</td>
+                                <td class="px-4 py-2 text-right text-slate-800">8</td>
+                            </tr>
+                            <tr class="bg-blue-50/50 font-semibold text-blue-800">
+                                <td class="px-4 py-3">Total Matemática</td>
+                                <td class="px-4 py-3 text-right">30</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</main>
+</body>
+
+</html>
