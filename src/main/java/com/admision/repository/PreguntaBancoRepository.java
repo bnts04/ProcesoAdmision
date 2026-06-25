@@ -5,6 +5,8 @@ import com.admision.enums.ComponentePregunta;
 import com.admision.enums.EstadoPregunta;
 import com.admision.enums.SubcursoPregunta;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
@@ -12,7 +14,9 @@ public interface PreguntaBancoRepository extends JpaRepository<PreguntaBanco, Lo
 
     List<PreguntaBanco> findAllByOrderByFechaRegistroDesc();
 
-    List<PreguntaBanco> findByEstadoOrderByFechaRegistroDesc(EstadoPregunta estado);
+    List<PreguntaBanco> findByEstadoOrderByFechaRegistroDesc(
+            EstadoPregunta estado
+    );
 
     List<PreguntaBanco> findByComponenteAndEstadoOrderByFechaRegistroDesc(
             ComponentePregunta componente,
@@ -25,7 +29,9 @@ public interface PreguntaBancoRepository extends JpaRepository<PreguntaBanco, Lo
             EstadoPregunta estado
     );
 
-    long countByEstado(EstadoPregunta estado);
+    long countByEstado(
+            EstadoPregunta estado
+    );
 
     long countByComponenteAndEstado(
             ComponentePregunta componente,
@@ -36,5 +42,18 @@ public interface PreguntaBancoRepository extends JpaRepository<PreguntaBanco, Lo
             ComponentePregunta componente,
             SubcursoPregunta subcurso,
             EstadoPregunta estado
+    );
+
+    /**
+     * Detecta si ya existe una pregunta con el mismo enunciado,
+     * ignorando mayúsculas, minúsculas y espacios al inicio o final.
+     */
+    @Query("""
+            SELECT CASE WHEN COUNT(p) > 0 THEN true ELSE false END
+            FROM PreguntaBanco p
+            WHERE LOWER(TRIM(p.enunciado)) = LOWER(TRIM(:enunciado))
+            """)
+    boolean existsByEnunciadoNormalizado(
+            @Param("enunciado") String enunciado
     );
 }

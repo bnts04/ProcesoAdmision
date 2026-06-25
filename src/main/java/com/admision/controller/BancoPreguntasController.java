@@ -24,6 +24,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import com.admision.dto.importacion.ResultadoImportacionBancoResponse;
+import com.admision.service.ImportadorBancoPreguntasService;
+
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -36,6 +39,7 @@ import java.util.Map;
 public class BancoPreguntasController {
 
     private final BancoPreguntasService bancoPreguntasService;
+    private final ImportadorBancoPreguntasService importadorBancoPreguntasService;
 
     @PostMapping
     public ResponseEntity<PreguntaBancoResponse> registrarPregunta(
@@ -121,6 +125,29 @@ public class BancoPreguntasController {
         response.put("mensaje", ex.getMessage());
 
         return ResponseEntity.badRequest().body(response);
+    }
+
+    @PostMapping(
+            value = "/importar-inicial",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
+    public ResponseEntity<ResultadoImportacionBancoResponse> importarBancoInicial(
+            @RequestParam("archivoExcel")
+            MultipartFile archivoExcel,
+
+            @RequestParam(
+                    value = "archivoImagenes",
+                    required = false
+            )
+            MultipartFile archivoImagenes
+    ) {
+        ResultadoImportacionBancoResponse resultado =
+                importadorBancoPreguntasService.importarBanco(
+                        archivoExcel,
+                        archivoImagenes
+                );
+
+        return ResponseEntity.ok(resultado);
     }
 
     @ExceptionHandler(RuntimeException.class)

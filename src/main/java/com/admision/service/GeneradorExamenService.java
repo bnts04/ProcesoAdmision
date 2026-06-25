@@ -166,6 +166,15 @@ public class GeneradorExamenService {
     }
 
     @Transactional(readOnly = true)
+    public List<ExamenGeneradoResponse> listarExamenes() {
+        return examenGeneradoRepository
+                .findAllByOrderByFechaGeneracionDesc()
+                .stream()
+                .map(this::convertirExamenAResponse)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
     public DetalleExamenBaseResponse obtenerExamenBase(Long examenId) {
         ExamenGenerado examen = buscarExamen(examenId);
 

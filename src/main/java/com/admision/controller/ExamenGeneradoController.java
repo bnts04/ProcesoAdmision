@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import java.util.List;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -27,6 +28,13 @@ public class ExamenGeneradoController {
     ) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(generadorExamenService.generarExamen(request));
+    }
+
+    @GetMapping
+    public ResponseEntity<List<ExamenGeneradoResponse>> listarExamenes() {
+        return ResponseEntity.ok(
+                generadorExamenService.listarExamenes()
+        );
     }
 
     @GetMapping("/{examenId}")
