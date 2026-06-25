@@ -3,7 +3,6 @@ let preguntaSeleccionadaId = null;
 let imagenModificada = false;
 let imagenEliminarPendiente = false;
 
-// Mapeo Estricto de Subcursos por cada Componente (Igual al de registrarPregunta.js)
 const subcursosPorComponente = {
   'CTA': [
     { value: 'FISICA', label: 'Física' },
@@ -19,7 +18,11 @@ const subcursosPorComponente = {
   'HUMANIDADES': [
     { value: 'HISTORIA', label: 'Historia' },
     { value: 'LENGUAJE', label: 'Lenguaje' },
-    { value: 'LITERATURA', label: 'Literatura' }
+    { value: 'LITERATURA', label: 'Literatura' },
+    { value: 'ECONOMIA', label: 'Economía' },
+    { value: 'EDUCACION_CIVICA', label: 'Educación Cívica' },
+    { value: 'PSICOLOGIA', label: 'Psicología' },
+    { value: 'GEOGRAFIA', label: 'Geografía' }
   ],
   'RAZONAMIENTO_VERBAL': [
     { value: 'RAZONAMIENTO_VERBAL', label: 'Razonamiento Verbal General' }
@@ -29,12 +32,10 @@ const subcursosPorComponente = {
   ]
 };
 
-// Elementos de Control de Vistas
 const seccionListado = document.getElementById('seccionListado');
 const seccionFormulario = document.getElementById('seccionFormulario');
 const tablaPreguntasBody = document.getElementById('tablaPreguntasBody');
 
-// Elementos del Formulario de Edición
 const formEditarPregunta = document.getElementById('formEditarPregunta');
 const txtCodigoPregunta = document.getElementById('txtCodigoPregunta');
 const editComponente = document.getElementById('editComponente');
@@ -49,14 +50,12 @@ const editAltC = document.getElementById('editAltC');
 const editAltD = document.getElementById('editAltD');
 const editAltE = document.getElementById('editAltE');
 
-// Elementos de Imagen
 const inputFileImagen = document.getElementById('inputFileImagen');
 const imgPreviewSrc = document.getElementById('imgPreviewSrc');
 const fallbackNoImg = document.getElementById('fallbackNoImg');
 const btnCambiarImg = document.getElementById('btnCambiarImg');
 const btnQuitarImg = document.getElementById('btnQuitarImg');
 
-// Elementos de Vista Previa
 const liveEnunciado = document.getElementById('liveEnunciado');
 const liveContenedorImg = document.getElementById('liveContenedorImg');
 const liveImgSrc = document.getElementById('liveImgSrc');
@@ -70,15 +69,25 @@ document.addEventListener('DOMContentLoaded', () => {
     cargarListaPreguntas();
     vincularEscuchasLivePreview();
 
-    // Escucha de cambio en el Componente para actualizar los Subcursos en tiempo real
     editComponente.addEventListener('change', () => {
         actualizarSelectSubcursos(editComponente.value, null);
     });
+
+    editEstado.addEventListener('change', actualizarColorEstado);
 });
+
 
 async function cargarListaPreguntas() {
     try {
-        const response = await fetch(API_BASE_URL);
+
+        const response = await fetch(`${API_BASE_URL}?_=${Date.now()}`, {
+            method: 'GET',
+            headers: {
+                'Cache-Control': 'no-cache',
+                'Pragma': 'no-cache'
+            }
+        });
+
         if (response.ok) {
             const preguntas = await response.json();
             renderizarTablaPreguntas(preguntas);
@@ -102,14 +111,15 @@ function renderizarTablaPreguntas(lista) {
         const tr = document.createElement('tr');
         tr.className = "hover:bg-slate-50 transition border-b border-slate-100";
 
-        const badgeEstado = p.activo
-            ? `<span class="bg-green-100 text-green-700 px-2 py-0.5 rounded-full text-xs font-semibold">ACTIVA</span>`
-            : `<span class="bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full text-xs font-semibold">INACTIVA</span>`;
+        const esActiva = (p.estado === "ACTIVA");
+        const badgeEstado = esActiva
+            ? `<span class="bg-green-100 text-green-700 px-2.5 py-1 rounded-full text-xs font-bold border border-green-200">ACTIVA</span>`
+            : `<span class="bg-red-100 text-red-700 px-2.5 py-1 rounded-full text-xs font-bold border border-red-200">INACTIVA</span>`;
 
         tr.innerHTML = `
-            <td class="px-6 py-4 font-semibold text-slate-700">#${p.id}</td>
-            <td class="px-6 py-4 text-slate-600 font-medium">${p.componente}</td>
-            <td class="px-6 py-4 text-slate-500">${p.subcurso || 'General'}</td>
+            <td class="px-6 py-4 font-semibold text-slate-700 font-mono">${p.codigo || '#' + p.id}</td>
+            <td class="px-6 py-4 text-slate-600 font-medium">${p.nombreComponente || p.componente}</td>
+            <td class="px-6 py-4 text-slate-500">${p.nombreSubcurso || p.subcurso || 'General'}</td>
             <td class="px-6 py-4 text-slate-700 max-w-xs truncate">${p.enunciado}</td>
             <td class="px-6 py-4 text-center">${badgeEstado}</td>
             <td class="px-6 py-4 text-center">
@@ -122,7 +132,6 @@ function renderizarTablaPreguntas(lista) {
     });
 }
 
-// Función auxiliar para repoblar el combo de subcursos de acuerdo al componente elegido
 function actualizarSelectSubcursos(componenteKey, subcursoSeleccionado) {
     editSubcurso.innerHTML = '';
     const lista = subcursosPorComponente[componenteKey] || [];
@@ -153,16 +162,15 @@ async function abrirEdicionPregunta(id) {
         imagenModificada = false;
         imagenEliminarPendiente = false;
 
-        txtCodigoPregunta.innerText = `ID: ${pregunta.id}`;
+        txtCodigoPregunta.innerText = pregunta.codigo ? `CÓDIGO: ${pregunta.codigo}` : `ID: ${pregunta.id}`;
         editEnunciado.value = pregunta.enunciado;
-        editEstado.value = pregunta.activo ? "true" : "false";
+
+        editEstado.value = (pregunta.estado === "ACTIVA") ? "true" : "false";
         editRespuestaCorrecta.value = pregunta.respuestaCorrecta;
 
-        // Desbloqueamos los selectores
         editComponente.disabled = false;
         editSubcurso.disabled = false;
 
-        // Poblamos los 5 componentes principales y seleccionamos el actual
         editComponente.innerHTML = `
             <option value="CTA" ${pregunta.componente === 'CTA' ? 'selected' : ''}>Ciencia, Tecnología y Ambiente</option>
             <option value="MATEMATICA" ${pregunta.componente === 'MATEMATICA' ? 'selected' : ''}>Matemática</option>
@@ -171,7 +179,6 @@ async function abrirEdicionPregunta(id) {
             <option value="RAZONAMIENTO_MATEMATICO" ${pregunta.componente === 'RAZONAMIENTO_MATEMATICO' ? 'selected' : ''}>Razonamiento Matemático</option>
         `;
 
-        // Poblamos dinámicamente sus subcursos correspondientes respetando lo que guardó en la BD
         actualizarSelectSubcursos(pregunta.componente, pregunta.subcurso);
 
         if (pregunta.alternativas && pregunta.alternativas.length >= 5) {
@@ -182,8 +189,8 @@ async function abrirEdicionPregunta(id) {
             editAltE.value = pregunta.alternativas[4].texto;
         }
 
-        if (pregunta.rutaImagen) {
-            const fullImgUrl = pregunta.rutaImagen.startsWith('http') ? pregunta.rutaImagen : `http://localhost:8080${pregunta.rutaImagen}`;
+        if (pregunta.imagenUrl) {
+            const fullImgUrl = pregunta.imagenUrl.startsWith('http') ? pregunta.imagenUrl : `http://localhost:8080${pregunta.imagenUrl}`;
             imgPreviewSrc.src = fullImgUrl;
             imgPreviewSrc.classList.remove('hidden');
             fallbackNoImg.classList.add('hidden');
@@ -197,6 +204,8 @@ async function abrirEdicionPregunta(id) {
 
         seccionListado.classList.add('hidden');
         seccionFormulario.classList.remove('hidden');
+
+        actualizarColorEstado();
         actualizarLivePreview();
 
     } catch (error) {
@@ -253,7 +262,6 @@ function regresarAListado() {
     cargarListaPreguntas();
 }
 
-// --- ACCIÓN: SUBMIT PARA ENVIAR MODIFICACIONES (PUT) ---
 formEditarPregunta.addEventListener('submit', async (e) => {
     e.preventDefault();
 
@@ -264,7 +272,11 @@ formEditarPregunta.addEventListener('submit', async (e) => {
 
     const formData = new FormData();
     formData.append('enunciado', editEnunciado.value);
-    formData.append('activo', editEstado.value === "true");
+
+
+    const estadoString = (editEstado.value === "true") ? "ACTIVA" : "INACTIVA";
+    formData.append('estado', estadoString);
+
     formData.append('respuestaCorrecta', editRespuestaCorrecta.value);
 
     formData.append('alternativaA', editAltA.value);
@@ -280,7 +292,6 @@ formEditarPregunta.addEventListener('submit', async (e) => {
         formData.append('imagen', inputFileImagen.files[0]);
     }
 
-    // Aquí mandamos los nuevos valores editados del Componente y Subcurso
     formData.append('componente', editComponente.value);
     formData.append('subcurso', editSubcurso.value);
 
@@ -294,7 +305,7 @@ formEditarPregunta.addEventListener('submit', async (e) => {
             throw new Error('Error al actualizar la pregunta');
         }
 
-        const data = await response.json();
+        await response.json();
         mostrarNotificacionExito("Pregunta actualizada correctamente.");
         regresarAListado();
     } catch (error) {
@@ -306,14 +317,18 @@ formEditarPregunta.addEventListener('submit', async (e) => {
     }
 });
 
-// --- VISTA PREVIA INTERACTIVA EN TIEMPO REAL ---
+
 function vincularEscuchasLivePreview() {
-    const inputs = [editEnunciado, editAltA, editAltB, editAltC, editAltD, editAltE, editRespuestaCorrecta];
+    const inputs = [editEnunciado, editAltA, editAltB, editAltC, editAltD, editAltE];
     inputs.forEach(input => input.addEventListener('input', actualizarLivePreview));
     editRespuestaCorrecta.addEventListener('change', actualizarLivePreview);
+    editEstado.addEventListener('change', actualizarLivePreview);
 }
 
 function actualizarLivePreview() {
+    const esPreguntaActiva = editEstado.value === "true";
+    const liveCard = document.getElementById('liveCard') || liveEnunciado.closest('.bg-white') || liveEnunciado.parentElement;
+
     liveEnunciado.innerText = editEnunciado.value.trim() || 'Sin enunciado definido...';
     if (editEnunciado.value.trim()) liveEnunciado.classList.remove('italic', 'text-slate-400');
     else liveEnunciado.classList.add('italic', 'text-slate-400');
@@ -339,11 +354,26 @@ function actualizarLivePreview() {
         const badgeActivo = activa.querySelector('span:first-child');
         badgeActivo.className = "w-6 h-6 rounded-full bg-green-600 border border-green-600 flex items-center justify-center text-xs font-bold text-white shadow-sm";
     }
+
+    if (liveCard) {
+        const avisoPrevio = liveCard.parentElement.querySelector('.badge-inactivo-live');
+        if (avisoPrevio) avisoPrevio.remove();
+
+        if (!esPreguntaActiva) {
+            liveCard.classList.add('opacity-60', 'grayscale-[20%]', 'pointer-events-none');
+            const avisoInactivo = document.createElement('div');
+            avisoInactivo.className = "badge-inactivo-live mt-2 text-center text-xs bg-red-100 text-red-700 font-bold py-1 px-3 rounded-lg border border-red-200 animate-pulse";
+            avisoInactivo.innerText = "⚠️ VISTA PREVIA: Esta pregunta se guardará como INACTIVA y ocultada del alumno.";
+            liveCard.after(avisoInactivo);
+        } else {
+            liveCard.classList.remove('opacity-60', 'grayscale-[20%]', 'pointer-events-none');
+        }
+    }
 }
 
-// --- ALERTA TOAST DE ÉXITO ---
 function mostrarNotificacionExito(mensaje) {
     const container = document.getElementById('toastContainer');
+    if (!container) return;
     const toast = document.createElement('div');
     toast.className = `flex items-center p-4 mb-4 w-full max-w-xs text-gray-800 bg-white rounded-xl shadow-lg border-l-4 border-green-500 transform translate-x-full transition-all duration-300 ease-out pointer-events-auto opacity-0`;
     toast.innerHTML = `
@@ -360,4 +390,15 @@ function mostrarNotificacionExito(mensaje) {
         toast.classList.add('translate-x-full', 'opacity-0');
         setTimeout(() => toast.remove(), 300);
     }, 3000);
+}
+
+function actualizarColorEstado() {
+    const esActivo = editEstado.value === "true";
+    editEstado.classList.remove('bg-green-50', 'border-green-500', 'text-green-700', 'focus:border-green-500', 'bg-red-50', 'border-red-500', 'text-red-700', 'focus:border-red-500');
+
+    if (esActivo) {
+        editEstado.classList.add('bg-green-50', 'border-green-500', 'text-green-700', 'focus:border-green-500');
+    } else {
+        editEstado.classList.add('bg-red-50', 'border-red-500', 'text-red-700', 'focus:border-red-500');
+    }
 }
