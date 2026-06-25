@@ -15,7 +15,11 @@ const subcursosPorComponente = {
   'HUMANIDADES': [
     { value: 'HISTORIA', label: 'Historia' },
     { value: 'LENGUAJE', label: 'Lenguaje' },
-    { value: 'LITERATURA', label: 'Literatura' }
+    { value: 'LITERATURA', label: 'Literatura' },
+    { value: 'ECONOMIA', label: 'Economía' },
+    { value: 'EDUCACION_CIVICA', label: 'Educación Cívica' },
+    { value: 'PSICOLOGIA', label: 'Psicología' },
+    { value: 'GEOGRAFIA', label: 'Geografía' }
   ],
   'RAZONAMIENTO_VERBAL': [
     { value: 'RAZONAMIENTO_VERBAL', label: 'Razonamiento Verbal General' }
@@ -25,7 +29,6 @@ const subcursosPorComponente = {
   ]
 };
 
-// Elementos del DOM
 const formPregunta = document.getElementById('formPregunta');
 const alertContainer = document.getElementById('alertContainer');
 const componenteSelect = document.getElementById('componente');
@@ -35,7 +38,6 @@ const badgeRespuesta = document.getElementById('badgeRespuesta');
 const btnLimpiar = document.getElementById('btnLimpiar');
 const btnGuardar = document.getElementById('btnGuardar');
 
-// Elementos de la imagen
 const dropzone = document.getElementById('dropzone');
 const inputImagen = document.getElementById('inputImagen');
 const nombreArchivoImg = document.getElementById('nombreArchivoImg');
@@ -43,7 +45,6 @@ const previewImg = document.getElementById('previewImg');
 const previewFallback = document.getElementById('previewFallback');
 const btnRemoverImg = document.getElementById('btnRemoverImg');
 
-// Elementos del Formulario para Escucha en Tiempo Real
 const txtEnunciado = document.getElementById('enunciado');
 const txtAltA = document.getElementById('alternativaA');
 const txtAltB = document.getElementById('alternativaB');
@@ -51,7 +52,6 @@ const txtAltC = document.getElementById('alternativaC');
 const txtAltD = document.getElementById('alternativaD');
 const txtAltE = document.getElementById('alternativaE');
 
-// Elementos de la Vista Previa Rápida (Derecha)
 const viewEnunciado = document.getElementById('livePreviewEnunciado');
 const containerLiveImg = document.getElementById('livePreviewContenedorImagen');
 const srcLiveImg = document.getElementById('livePreviewImagenSrc');
@@ -130,7 +130,6 @@ function removerImagenSeleccionada(e) {
 
 
 
-// FUNCIÓN PARA PREVISUALIZAR LA PREGUNTA
 
 function actualizarVistaPreviaCompleta() {
   const escucharYCopiar = (input, elementoPreview, placeholder) => {
@@ -182,7 +181,6 @@ function marcarRespuestaCorrectaPreview() {
 
 
 
-// TRAER CONTADORES REALES EN BASE A TU DTO BACKEND
 async function cargarResumenBanco() {
   try {
     const response = await fetch(`${API_BASE_URL}/resumen`);
@@ -224,7 +222,6 @@ async function cargarResumenBanco() {
 }
 
 
-//  ENVÍO DE DATOS POR POST
 formPregunta.addEventListener('submit', async (e) => {
   e.preventDefault();
   mostrarAlerta(false);
@@ -313,7 +310,6 @@ function mostrarAlerta(visible, mensaje = '', tipo = 'success') {
 }
 
 
-// --- FUNCIÓN PARA MOSTRAR EL TOAST FLOTANTE ---
 function mostrarNotificacionExito(mensaje) {
   const container = document.getElementById('toastContainer');
 
