@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Resultados de Admisión - UNICA</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        button:disabled {
+            opacity: .42;
+            cursor: not-allowed;
+        }
+
+        .sidebar-active {
+            color: #fff;
+            background: #0052cc;
+            font-weight: 600;
+        }
+
+        .sidebar-normal {
+            color: #d1d5db;
+        }
+
+        .sidebar-normal:hover {
+            background: rgba(255, 255, 255, .10);
+            color: #fff;
+        }
+    </style>
+</head>
+
+<body class="bg-[#f4f6f9] text-gray-800 h-screen flex flex-col overflow-hidden">
+
+    <header
+        class="bg-[#002B69] text-white h-16 flex items-center justify-between px-6 border-b-4 border-[#D4A311] shrink-0">
+        <div class="flex items-center gap-3">
+            <i data-lucide="menu" class="w-6 h-6 cursor-pointer"></i>
+            <div>
+                <h1 class="text-sm font-bold uppercase tracking-wide">Universidad Nacional San Luis Gonzaga</h1>
+                <p class="text-[11px] text-gray-300 font-medium -mt-0.5">Comisión Ejecutiva Central de Admisión</p>
+            </div>
+        </div>
+        <div class="text-lg font-semibold tracking-wide">Sistema de Resultados de Admisión</div>
+        <div class="flex items-center gap-3">
+            <span id="badge-proceso-actual"
+                class="hidden bg-white/10 border border-white/20 text-white text-xs px-3 py-1 rounded-full"></span>
+            <div
+                class="w-10 h-10 bg-[#D4A311] rounded-tl-xl rounded-br-xl flex items-center justify-center font-bold text-xs text-blue-900 shadow-md border border-white">
+                <i data-lucide="graduation-cap" class="w-5 h-5"></i>
+            </div>
+        </div>
+    </header>
+
+    <div class="flex flex-1 overflow-hidden">
+        <aside class="w-64 bg-[#0a2540] text-gray-300 flex flex-col justify-between shrink-0">
+            <nav class="p-4 space-y-1 flex-1">
+                <button onclick="navegarModulo('carga', 'Gestión de proceso')" id="btn-carga"
+                    class="w-full flex items-center gap-3 px-4 py-3 rounded-lg sidebar-active transition-colors text-left">
+                    <i data-lucide="upload-cloud" class="w-5 h-5"></i> Gestión de proceso
+                </button>
+
+                <button onclick="navegarModulo('dashboard', 'Dashboard global')" id="btn-dashboard"
+                    class="w-full flex items-center gap-3 px-4 py-3 rounded-lg sidebar-normal transition-colors text-left">
+                    <i data-lucide="layout-dashboard" class="w-5 h-5"></i> Dashboard global
+                </button>
+
+                <button onclick="navegarModulo('reporte', 'Asignación de Vacantes')" id="btn-reporte"
+                    class="w-full flex items-center gap-3 px-4 py-3 rounded-lg sidebar-normal transition-colors text-left">
+                    <i data-lucide="bar-chart-3" class="w-5 h-5"></i> Asignación de Vacantes
+                </button>
+
+                <button onclick="navegarModulo('vista-previa', 'Resultados por Carrera')" id="btn-vista-previa"
+                    class="w-full flex items-center gap-3 px-4 py-3 rounded-lg sidebar-normal transition-colors text-left">
+                    <i data-lucide="eye" class="w-5 h-5"></i> Resultados por Carrera
+                </button>
+
+                <button onclick="navegarModulo('historial', 'Historial')" id="btn-historial"
+                    class="w-full flex items-center gap-3 px-4 py-3 rounded-lg sidebar-normal transition-colors text-left">
+                    <i data-lucide="history" class="w-5 h-5"></i> Historial
+                </button>
+
+                <button onclick="navegarModulo('anulacion', 'Anulación de postulante')" id="btn-anulacion"
+                    class="w-full flex items-center gap-3 px-4 py-3 rounded-lg sidebar-normal transition-colors text-left text-red-300 hover:text-red-200">
+                    <i data-lucide="ban" class="w-5 h-5"></i> Anulación de postulante
+                </button>
+            </nav>
+
+            <div class="p-4 border-t border-gray-700 bg-[#071e33] flex items-center gap-3">
+                <div class="w-9 h-9 rounded-full bg-gray-500 flex items-center justify-center text-white">
+                    <i data-lucide="user" class="w-5 h-5"></i>
+                </div>
+                <div class="overflow-hidden">
+                    <p class="text-xs font-semibold text-white truncate">admision@unica.edu.pe</p>
+                    <p class="text-[10px] text-gray-400 truncate">Comisión de Admisión</p>
+                </div>
+            </div>
+        </aside>
+
+        <main class="flex-1 p-6 overflow-y-auto">
+
+            <!-- GESTIÓN DE PROCESO -->
+            <section id="vista-carga" class="flex flex-col gap-6">
+                <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-3">
+                    <div>
+                        <h2 class="text-2xl font-bold text-blue-900 tracking-tight">Gestión de proceso</h2>
+                        <p class="text-sm text-gray-500 mt-1">Crea un nuevo proceso, sube los tres DBF y ejecuta el
+                            procesamiento completo.</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="limpiarProcesoActualUI()"
+                            class="bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 text-sm font-semibold py-2.5 px-4 rounded-lg flex items-center gap-2">
+                            <i data-lucide="refresh-cw" class="w-4 h-4"></i> Limpiar selección
+                        </button>
+                        <button id="btn-procesar-todo" onclick="ejecutarProcesamientoCompletoActual()" disabled
+                            class="bg-green-600 hover:bg-green-700 text-white text-sm font-bold py-2.5 px-5 rounded-lg flex items-center gap-2 shadow-sm">
+                            <i data-lucide="play-circle" class="w-4 h-4"></i> Procesar todo
+                        </button>
+                    </div>
+                </div>
+
+                <div id="estado-proceso-box"
+                    class="bg-blue-50 border border-blue-200 text-blue-900 p-4 rounded-xl text-sm">
+                    No hay proceso seleccionado. Crea un proceso nuevo para continuar.
+                </div>
+
+                <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+                    <div class="xl:col-span-2 bg-white p-8 rounded-xl shadow-sm border border-gray-100">
+                        <h3
+                            class="font-bold text-sm text-blue-900 mb-6 uppercase tracking-wide border-b pb-3 flex items-center gap-2">
+                            <i data-lucide="folder-plus" class="w-5 h-5 text-blue-700"></i> Crear nuevo proceso
+                        </h3>
+
+                        <form id="form-proceso" class="space-y-6">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
+                                <label class="block text-sm font-semibold text-gray-600 uppercase md:text-right">
+                                    Nombre del proceso:
+                                </label>
+
+                                <div class="md:col-span-2">
+                                    <input type="text" id="input-nombre-proceso" placeholder="Ej. Admisión 2026-I"
+                                        class="w-full bg-white border border-gray-300 text-gray-800 text-sm rounded-lg focus:ring-[#0052cc] focus:border-[#0052cc] block p-2.5 outline-none transition-all shadow-sm">
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
+                                <label class="block text-sm font-semibold text-gray-600 uppercase md:text-right">
+                                    Modalidad:
+                                </label>
+
+                                <div class="md:col-span-2 flex flex-wrap gap-3">
+                                    <button type="button"
+                                        class="modal-pill px-5 py-2 text-sm font-semibold rounded-full bg-[#0052cc] text-white shadow-md transition-colors active"
+                                        data-modalidad="Admisión Ordinaria">
+                                        ORDINARIO
+                                    </button>
+
+                                    <button type="button"
+                                        class="modal-pill px-5 py-2 text-sm font-semibold rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors"
+                                        data-modalidad="Admisión Extraordinaria">
+                                        EXTRAORDINARIO
+                                    </button>
+
+                                    <button type="button"
+                                        class="modal-pill px-5 py-2 text-sm font-semibold rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors"
+                                        data-modalidad="CEPU">
+                                        CEPU
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="bg-blue-50 border border-blue-200 rounded-xl p-5">
+                                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3 mb-4">
+                                    <div>
+                                        <h4 class="font-bold text-blue-900 text-sm flex items-center gap-2">
+                                            <i data-lucide="calculator" class="w-4 h-4"></i>
+                                            Configuración de calificación
+                                        </h4>
+
+                                        <p class="text-xs text-gray-500 mt-1">
+                                            Valores usados para calcular el puntaje del proceso. Puede dejar los valores
+                                            por defecto.
+                                        </p>
+                                    </div>
+
+                                    <div class="flex gap-2">
+                                        <button type="button" onclick="restaurarCalificacionDefecto()"
+                                            class="bg-white hover:bg-gray-50 border border-gray-300 text-gray-700 text-xs font-semibold py-2 px-3 rounded-lg">
+                                            Restaurar defecto
+                                        </button>
+
+                                        <button type="button" onclick="guardarConfiguracionCalificacionProcesoActual()"
+                                            class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-2 px-3 rounded-lg">
+                                            Guardar configuración
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                                    <div>
+                                        <label class="block text-xs font-bold text-gray-700 mb-1">
+                                            Respuesta correcta
+                                        </label>
+
+                                        <input type="number" step="0.0001" id="input-puntaje-correcta" value="20.0000"
+                                            class="w-full bg-white border border-gray-300 text-gray-900 text-sm rounded-lg p-2.5 outline-none focus:ring-blue-500 focus:border-blue-500">
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-xs font-bold text-gray-700 mb-1">
+                                            Respuesta incorrecta
+                                        </label>
+
+                                        <input type="number" step="0.0001" id="input-puntaje-incorrecta" value="-1.2500"
+                                            class="w-full bg-white border border-gray-300 text-gray-900 text-sm rounded-lg p-2.5 outline-none focus:ring-blue-500 focus:border-blue-500">
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-xs font-bold text-gray-700 mb-1">
+                                            Blanca / nula
+                                        </label>
+
+                                        <input type="number" step="0.0001" id="input-puntaje-blanca" value="1.2500"
+                                            class="w-full bg-white border border-gray-300 text-gray-900 text-sm rounded-lg p-2.5 outline-none focus:ring-blue-500 focus:border-blue-500">
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-xs font-bold text-gray-700 mb-1">
+                                            Factor escala
+                                        </label>
+
+                                        <input type="number" step="0.0001" id="input-factor-escala" value="100.0000"
+                                            class="w-full bg-white border border-gray-300 text-gray-900 text-sm rounded-lg p-2.5 outline-none focus:ring-blue-500 focus:border-blue-500">
+                                    </div>
+                                </div>
+
+                                <p id="texto-configuracion-calificacion" class="text-xs text-blue-700 mt-3">
+                                    Configuración por defecto: correcta 20.00, incorrecta -1.25, blanca/nula 1.25,
+                                    factor 100.
+                                </p>
+                            </div>
+
+                            <div class="bg-white border border-gray-200 rounded-xl p-5 shadow-sm">
+                                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3 mb-4">
+                                    <div>
+                                        <h4 class="font-bold text-blue-900 text-sm flex items-center gap-2">
+                                            <i data-lucide="list-checks" class="w-4 h-4"></i>
+                                            Vacantes del proceso
+                                        </h4>
+
+                                        <p id="texto-vacantes-proceso" class="text-xs text-gray-500 mt-1">
+                                            Las vacantes se cargan cuando existe un proceso activo. Puede editarlas
+                                            antes de procesar.
+                                        </p>
+                                    </div>
+
+                                    <div class="flex flex-wrap gap-2">
+                                        <button type="button" id="btn-actualizar-vacantes-proceso"
+                                            onclick="cargarVacantesProcesoActual(true)"
+                                            class="bg-white hover:bg-gray-50 border border-gray-300 text-gray-700 text-xs font-semibold py-2 px-3 rounded-lg">
+                                            <i data-lucide="refresh-cw" class="w-4 h-4 inline-block mr-1"></i>
+                                            Actualizar
+                                        </button>
+
+                                        <button type="button" id="btn-guardar-vacantes-proceso"
+                                            onclick="guardarVacantesProcesoActual()"
+                                            class="bg-green-600 hover:bg-green-700 text-white text-xs font-bold py-2 px-3 rounded-lg">
+                                            <i data-lucide="save" class="w-4 h-4 inline-block mr-1"></i>
+                                            Guardar vacantes
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
+                                    <div class="bg-blue-50 border border-blue-100 rounded-lg p-3">
+                                        <p class="text-xs text-gray-500">Carreras configuradas</p>
+                                        <p id="cantidad-carreras-vacantes" class="text-xl font-bold text-blue-900">0</p>
+                                    </div>
+
+                                    <div class="bg-green-50 border border-green-100 rounded-lg p-3">
+                                        <p class="text-xs text-gray-500">Total vacantes</p>
+                                        <p id="total-vacantes-proceso" class="text-xl font-bold text-green-700">0</p>
+                                    </div>
+
+                                    <div class="bg-amber-50 border border-amber-100 rounded-lg p-3">
+                                        <p class="text-xs text-gray-500">Estado</p>
+                                        <p id="estado-vacantes-proceso" class="text-sm font-bold text-amber-700">
+                                            Pendiente</p>
+                                    </div>
+                                </div>
+
+                                <div class="border border-gray-200 rounded-lg overflow-hidden">
+                                    <div class="overflow-x-auto max-h-80">
+                                        <table class="w-full text-left border-collapse text-xs">
+                                            <thead class="sticky top-0 z-10">
+                                                <tr class="bg-[#002B69] text-white font-semibold">
+                                                    <th class="p-3">Facultad</th>
+                                                    <th class="p-3">Carrera</th>
+                                                    <th class="p-3 text-center">Vacantes</th>
+                                                </tr>
+                                            </thead>
+
+                                            <tbody id="tabla-vacantes-proceso-body">
+                                                <tr>
+                                                    <td colspan="3" class="p-6 text-center text-gray-400">
+                                                        Seleccione o cree un proceso para cargar vacantes.
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                <p class="text-[11px] text-gray-500 mt-3">
+                                    Si modifica vacantes en un proceso ya procesado, debe volver a presionar “Procesar
+                                    todo” para recalcular la condición de ingreso.
+                                </p>
+                            </div>
+
+                            <div
+                                class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-gray-50 p-5 rounded-xl border border-gray-200">
+                                <div id="card-file-postulantes"
+                                    class="bg-white border border-gray-300 rounded-lg p-3 flex items-center justify-between shadow-sm transition-all duration-300">
+                                    <div class="flex items-center gap-3 overflow-hidden">
+                                        <div id="icon-container-postulantes"
+                                            class="w-9 h-9 bg-blue-50 text-blue-600 rounded-lg flex items-center justify-center shrink-0">
+                                            <i data-lucide="database" class="w-5 h-5"></i>
+                                        </div>
+
+                                        <div class="flex flex-col truncate">
+                                            <span class="text-sm font-medium text-gray-800">Datos postulantes</span>
+                                            <span id="txt-file-postulantes"
+                                                class="text-xs text-gray-400 block truncate">
+                                                Seleccionar IDENTIFI.DBF
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <input type="file" id="file-postulantes" accept=".dbf" class="hidden"
+                                        onchange="evaluarArchivoSeleccionado('file-postulantes','txt-file-postulantes','card-file-postulantes','icon-container-postulantes')">
+
+                                    <label for="file-postulantes"
+                                        class="text-xs font-semibold text-[#0052cc] hover:underline shrink-0 ml-2 cursor-pointer select-none">
+                                        Seleccionar
+                                    </label>
+                                </div>
+
+                                <div id="card-file-claves"
+                                    class="bg-white border border-gray-300 rounded-lg p-3 flex items-center justify-between shadow-sm transition-all duration-300">
+                                    <div class="flex items-center gap-3 overflow-hidden">
+                                        <div id="icon-container-claves"
+                                            class="w-9 h-9 bg-blue-50 text-blue-600 rounded-lg flex items-center justify-center shrink-0">
+                                            <i data-lucide="database" class="w-5 h-5"></i>
+                                        </div>
+
+                                        <div class="flex flex-col truncate">
+                                            <span class="text-sm font-medium text-gray-800">Claves correctas</span>
+                                            <span id="txt-file-claves" class="text-xs text-gray-400 block truncate">
+                                                Seleccionar CLAVES.DBF
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <input type="file" id="file-claves" accept=".dbf" class="hidden"
+                                        onchange="evaluarArchivoSeleccionado('file-claves','txt-file-claves','card-file-claves','icon-container-claves')">
+
+                                    <label for="file-claves"
+                                        class="text-xs font-semibold text-[#0052cc] hover:underline shrink-0 ml-2 cursor-pointer select-none">
+                                        Seleccionar
+                                    </label>
+                                </div>
+
+                                <div id="card-file-respuestas"
+                                    class="bg-white border border-gray-300 rounded-lg p-3 flex items-center justify-between shadow-sm transition-all duration-300">
+                                    <div class="flex items-center gap-3 overflow-hidden">
+                                        <div id="icon-container-respuestas"
+                                            class="w-9 h-9 bg-blue-50 text-blue-600 rounded-lg flex items-center justify-center shrink-0">
+                                            <i data-lucide="database" class="w-5 h-5"></i>
+                                        </div>
+
+                                        <div class="flex flex-col truncate">
+                                            <span class="text-sm font-medium text-gray-800">Hoja de respuestas</span>
+                                            <span id="txt-file-respuestas" class="text-xs text-gray-400 block truncate">
+                                                Seleccionar RESPUEST.DBF
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <input type="file" id="file-respuestas" accept=".dbf" class="hidden"
+                                        onchange="evaluarArchivoSeleccionado('file-respuestas','txt-file-respuestas','card-file-respuestas','icon-container-respuestas')">
+
+                                    <label for="file-respuestas"
+                                        class="text-xs font-semibold text-[#0052cc] hover:underline shrink-0 ml-2 cursor-pointer select-none">
+                                        Seleccionar
+                                    </label>
+                                </div>
+
+                                <div
+                                    class="bg-amber-50 border border-amber-200 rounded-lg p-3 flex items-center justify-between shadow-sm">
+                                    <div class="flex items-center gap-3 overflow-hidden">
+                                        <div
+                                            class="w-9 h-9 bg-amber-100 text-amber-700 rounded-lg flex items-center justify-center shrink-0">
+                                            <i data-lucide="file-check-2" class="w-5 h-5"></i>
+                                        </div>
+
+                                        <div class="flex flex-col truncate">
+                                            <span class="text-sm font-medium text-gray-800">PDF guía</span>
+                                            <span class="text-xs text-amber-700 block truncate">
+                                                Ya guardado en el sistema. No se sube en demo.
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flex justify-center pt-4">
+                                <button type="submit"
+                                    class="w-full max-w-sm bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold py-3 px-8 rounded-xl transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 tracking-wide uppercase">
+                                    <i data-lucide="plus-circle" class="w-5 h-5"></i>
+                                    Crear proceso y subir DBF
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="space-y-6">
+                        <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+                            <h3
+                                class="font-bold text-sm text-blue-900 mb-4 flex items-center gap-2 border-b border-gray-100 pb-2">
+                                <i data-lucide="clipboard-list" class="w-4 h-4 text-blue-700"></i> Flujo de demostración
+                            </h3>
+                            <ul class="text-xs text-gray-600 space-y-3">
+                                <li class="flex items-center gap-2"><i data-lucide="check-circle-2"
+                                        class="text-green-500 w-4 h-4 shrink-0"></i> Crear proceso nuevo.</li>
+                                <li class="flex items-center gap-2"><i data-lucide="check-circle-2"
+                                        class="text-green-500 w-4 h-4 shrink-0"></i> Subir solo CLAVES, RESPUEST e
+                                    IDENTIFI en DBF.</li>
+                                <li class="flex items-center gap-2"><i data-lucide="check-circle-2"
+                                        class="text-green-500 w-4 h-4 shrink-0"></i> El PDF guía se reutiliza
+                                    automáticamente.</li>
+                                <li class="flex items-center gap-2"><i data-lucide="check-circle-2"
+                                        class="text-green-500 w-4 h-4 shrink-0"></i> Procesar todo y recién mostrar
+                                    dashboard.</li>
+                            </ul>
+                        </div>
+
+                        <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+                            <h3
+                                class="font-bold text-sm text-blue-900 mb-4 flex items-center gap-2 border-b border-gray-100 pb-2">
+                                <i data-lucide="list-checks" class="w-4 h-4 text-blue-700"></i> Vista previa final
+                            </h3>
+                            <div id="resumen-vista-previa-final" class="text-xs text-gray-600 space-y-2">
+                                Todavía no hay proceso seleccionado.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="modal-exito" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+                    <div class="absolute inset-0 bg-gray-900/60 backdrop-blur-sm"></div>
+                    <div
+                        class="bg-white rounded-2xl shadow-xl border border-gray-100 max-w-md w-full p-6 relative z-10 transform scale-95 opacity-0 transition-all duration-300 ease-out flex flex-col items-center text-center">
+                        <div
+                            class="w-16 h-16 bg-green-50 text-green-500 rounded-full flex items-center justify-center mb-4 ring-8 ring-green-50/50">
+                            <i data-lucide="check-circle-2" class="w-10 h-10"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-900 tracking-tight">Proceso creado correctamente</h3>
+                        <p class="text-sm text-gray-500 mt-2 leading-relaxed">
+                            Los DBF fueron cargados y validados. Ahora puedes ejecutar el procesamiento completo.
+                        </p>
+                        <button id="btn-cerrar-modal" type="button"
+                            class="mt-6 w-full bg-gray-900 hover:bg-gray-800 text-white text-sm font-semibold py-3 px-6 rounded-xl transition-colors shadow-md">
+                            Entendido
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- DASHBOARD -->
+            <section id="vista-dashboard" class="hidden space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center gap-4">
+                        <div
+                            class="w-12 h-12 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center shrink-0">
+                            <i data-lucide="users" class="w-6 h-6"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs font-medium text-gray-500">Total postulantes</p>
+                            <p id="dash-total" class="text-2xl font-bold text-gray-800">0</p>
+                        </div>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center gap-4">
+                        <div
+                            class="w-12 h-12 bg-green-50 text-green-600 rounded-full flex items-center justify-center shrink-0">
+                            <i data-lucide="check-circle" class="w-6 h-6"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs font-medium text-gray-500">Ingresantes</p>
+                            <p id="dash-ingresantes" class="text-2xl font-bold text-gray-800">0</p>
+                        </div>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center gap-4">
+                        <div
+                            class="w-12 h-12 bg-red-50 text-red-600 rounded-full flex items-center justify-center shrink-0">
+                            <i data-lucide="user-x" class="w-6 h-6"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs font-medium text-gray-500">No ingresantes</p>
+                            <p id="dash-noingresantes" class="text-2xl font-bold text-gray-800">0</p>
+                        </div>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center gap-4">
+                        <div
+                            class="w-12 h-12 bg-amber-50 text-amber-600 rounded-full flex items-center justify-center shrink-0">
+                            <i data-lucide="trophy" class="w-6 h-6"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs font-medium text-gray-500">Mayor puntaje</p>
+                            <p id="dash-max" class="text-2xl font-bold text-gray-800">0.00</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="p-4 bg-gray-50 border-b border-gray-100 flex justify-between items-center">
+                        <h3 class="font-bold text-sm text-blue-900">Listado general del proceso actual</h3>
+                        <button onclick="generarPdfGeneral()"
+                            class="bg-red-600 hover:bg-red-700 text-white text-xs font-semibold py-2.5 px-4 rounded-lg flex items-center gap-2">
+                            <i data-lucide="file-text" class="w-4 h-4"></i> Generar PDF general
+                        </button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse text-xs">
+                            <thead>
+                                <tr class="bg-[#002B69] text-white font-semibold">
+                                    <th class="p-3 w-12 text-center">N°</th>
+                                    <th class="p-3">Código</th>
+                                    <th class="p-3">Apellidos y nombres</th>
+                                    <th class="p-3 text-center">Puntaje</th>
+                                    <th class="p-3 text-center">OME</th>
+                                    <th class="p-3 text-center">OMG</th>
+                                    <th class="p-3 text-center">Condición</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dash-tabla-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ASIGNACIÓN/VACANTES -->
+            <section id="vista-reporte" class="hidden space-y-6">
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3 mb-4">
+                        <div>
+                            <h2 class="text-xl font-bold text-[#0a2540]">Asignación de Vacantes</h2>
+                            <p class="text-sm text-gray-500">Vista del proceso actual. Si aún no procesaste, aparecerá
+                                como pendiente.</p>
+                        </div>
+                        <button onclick="ejecutarProcesamientoCompletoActual()"
+                            class="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-colors shadow-sm">
+                            <i data-lucide="play-circle" class="w-4 h-4"></i> Procesar todo
+                        </button>
+                    </div>
+
+                    <div
+                        class="bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded-lg text-sm mb-4">
+                        Las vacantes base ya están configuradas en el sistema. El dashboard se mostrará recién cuando el
+                        proceso tenga resultados procesados.
+                    </div>
+
+                    <div class="overflow-x-auto rounded-lg border border-gray-200">
+                        <table class="w-full text-left border-collapse bg-white">
+                            <thead>
+                                <tr class="bg-gray-50 border-b border-gray-200 text-gray-700 font-semibold text-sm">
+                                    <th class="p-4">Facultad</th>
+                                    <th class="p-4">Carrera profesional</th>
+                                    <th class="p-4 w-40 text-center">Vacantes</th>
+                                    <th class="p-4 w-40 text-center">Postulantes</th>
+                                    <th class="p-4 w-40 text-center">Ingresantes</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabla-vacantes-body" class="divide-y divide-gray-200 text-sm text-gray-600">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- RESULTADOS POR CARRERA -->
+            <section id="vista-vista-previa" class="hidden space-y-6">
+                <div class="flex flex-col xl:flex-row gap-4">
+                    <div
+                        class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 min-w-[260px] shrink-0 flex flex-col justify-center">
+                        <p class="text-[11px] font-bold text-blue-900 uppercase tracking-wider mb-2">Seleccionar carrera
+                        </p>
+                        <select id="selector-carrera" onchange="filtrarPorCarrera()"
+                            class="w-full bg-white border border-gray-200 text-blue-600 hover:bg-blue-50 text-xs font-semibold py-2 rounded cursor-pointer">
+                            <option value="">GENERAL</option>
+                        </select>
+                        <button onclick="generarPdfPorCarrera()"
+                            class="mt-3 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold py-2.5 px-4 rounded-lg flex items-center justify-center gap-2">
+                            <i data-lucide="file-text" class="w-4 h-4"></i> PDF por carrera
+                        </button>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-5 gap-3 flex-1">
+                        <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center gap-3">
+                            <div
+                                class="w-10 h-10 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center shrink-0">
+                                <i data-lucide="users" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <p class="text-[10px] font-semibold text-gray-500 uppercase">Total</p>
+                                <p id="vp-total" class="text-xl font-bold text-gray-800">0</p>
+                            </div>
+                        </div>
+                        <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center gap-3">
+                            <div
+                                class="w-10 h-10 bg-green-50 text-green-600 rounded-full flex items-center justify-center shrink-0">
+                                <i data-lucide="check-circle-2" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <p class="text-[10px] font-semibold text-gray-500 uppercase">Ingresantes</p>
+                                <p id="vp-ingresantes" class="text-xl font-bold text-gray-800">0</p>
+                            </div>
+                        </div>
+                        <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center gap-3">
+                            <div
+                                class="w-10 h-10 bg-red-50 text-red-600 rounded-full flex items-center justify-center shrink-0">
+                                <i data-lucide="user-x" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <p class="text-[10px] font-semibold text-gray-500 uppercase">No ingresantes</p>
+                                <p id="vp-noingresantes" class="text-xl font-bold text-gray-800">0</p>
+                            </div>
+                        </div>
+                        <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center gap-3">
+                            <div
+                                class="w-10 h-10 bg-amber-50 text-amber-600 rounded-full flex items-center justify-center shrink-0">
+                                <i data-lucide="trophy" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <p class="text-[10px] font-semibold text-gray-500 uppercase">Máximo</p>
+                                <p id="vp-max" class="text-xl font-bold text-gray-800">0</p>
+                            </div>
+                        </div>
+                        <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center gap-3">
+                            <div
+                                class="w-10 h-10 bg-purple-50 text-purple-600 rounded-full flex items-center justify-center shrink-0">
+                                <i data-lucide="bar-chart-2" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <p class="text-[10px] font-semibold text-gray-500 uppercase">Promedio</p>
+                                <p id="vp-promedio" class="text-xl font-bold text-gray-800">0</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse text-xs">
+                            <thead>
+                                <tr class="bg-[#002B69] text-white font-semibold">
+                                    <th class="p-3 w-12 text-center">N°</th>
+                                    <th class="p-3">Código</th>
+                                    <th class="p-3">Apellidos y nombres</th>
+                                    <th class="p-3 text-center">Puntaje</th>
+                                    <th class="p-3 text-center">OME</th>
+                                    <th class="p-3 text-center">OMG</th>
+                                    <th class="p-3 text-center">Condición</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabla-vista-previa"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- HISTORIAL PDF -->
+            <section id="vista-historial" class="hidden flex flex-col gap-6">
+                <div>
+                    <h2 class="text-2xl font-bold text-blue-900 tracking-tight">Historial de PDFs</h2>
+                    <p class="text-sm text-gray-500 mt-1">PDFs generados para el proceso actual.</p>
+                </div>
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse text-xs">
+                            <thead>
+                                <tr class="bg-[#002B69] text-white font-semibold">
+                                    <th class="p-3">Tipo</th>
+                                    <th class="p-3">Carrera</th>
+                                    <th class="p-3">Archivo</th>
+                                    <th class="p-3 text-center">Fecha</th>
+                                    <th class="p-3 text-center">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabla-historial-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ANULACIÓN -->
+            <section id="vista-anulacion" class="hidden flex flex-col gap-6">
+                <div>
+                    <h2 class="text-2xl font-bold text-red-600 tracking-tight">Anulación de postulante</h2>
+                    <p class="text-sm text-gray-500 mt-1">Anula un postulante por código y adjunta evidencia. El puntaje
+                        se conserva como historial.</p>
+                </div>
+
+                <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+                    <div class="xl:col-span-2 bg-white p-8 rounded-xl shadow-sm border border-red-200">
+                        <form id="form-anulacion" class="space-y-5">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 mb-1">Código del postulante</label>
+                                <input type="text" id="anulacion-codigo" placeholder="Ej. 73578639"
+                                    class="w-full bg-white border border-gray-300 text-gray-900 text-sm font-semibold rounded-lg focus:ring-red-500 focus:border-red-500 block p-2.5 outline-none shadow-sm">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 mb-1">Motivo</label>
+                                <select id="anulacion-motivo"
+                                    class="w-full bg-white border border-gray-300 text-gray-700 text-sm rounded-lg focus:ring-red-500 focus:border-red-500 p-3 outline-none shadow-sm cursor-pointer">
+                                    <option value="">Seleccione un motivo...</option>
+                                    <option value="Irregularidad detectada durante el examen">Irregularidad detectada
+                                        durante el examen</option>
+                                    <option value="Indicios de fraude">Indicios de fraude</option>
+                                    <option value="Incumplimiento de normas de evaluación">Incumplimiento de normas de
+                                        evaluación</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 mb-1">Observación adicional</label>
+                                <textarea id="anulacion-observacion" rows="4" placeholder="Detalle adicional..."
+                                    class="w-full bg-white border border-gray-300 text-gray-700 text-sm rounded-lg focus:ring-red-500 focus:border-red-500 p-3 outline-none resize-none shadow-sm"></textarea>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 mb-1">Evidencia</label>
+                                <div
+                                    class="relative border-2 border-dashed border-blue-300 bg-blue-50/40 rounded-lg p-6 text-center hover:bg-blue-50 transition-colors cursor-pointer">
+                                    <i data-lucide="upload-cloud" class="w-10 h-10 text-blue-400 mx-auto mb-3"></i>
+                                    <p id="anulacion-texto-archivo" class="text-sm font-bold text-[#0052cc]">Arrastre o
+                                        seleccione archivo</p>
+                                    <p class="text-xs text-gray-500 mt-2">JPG, PNG o PDF máximo 10 MB</p>
+                                    <input type="file" id="anulacion-file-input" accept=".jpg,.jpeg,.png,.pdf"
+                                        class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+                                </div>
+                            </div>
+
+                            <div class="pt-4 border-t border-gray-100 flex justify-between items-center">
+                                <label class="flex items-center gap-3 cursor-pointer">
+                                    <input id="anulacion-toggle" type="checkbox" class="w-5 h-5">
+                                    <span class="text-sm font-bold text-gray-800">Confirmar anulación</span>
+                                </label>
+                                <button id="btn-submit-anulacion" type="submit"
+                                    class="bg-[#cc292b] hover:bg-red-700 text-white text-base font-semibold py-3 px-8 rounded-xl transition-colors shadow-md flex items-center gap-2">
+                                    <i data-lucide="file-warning" class="w-5 h-5"></i> Ejecutar anulación
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="bg-[#FFFDF5] p-8 rounded-xl border border-amber-200 shadow-sm">
+                        <h4 class="font-bold text-[#d97706] text-lg flex items-center gap-2 mb-4">
+                            <i data-lucide="info" class="w-6 h-6"></i> Nota importante
+                        </h4>
+                        <p class="text-sm text-gray-700 leading-relaxed mb-6">
+                            Esta acción cambia la condición del postulante a ANULADO y conserva el puntaje anterior como
+                            historial.
+                        </p>
+                        <ul class="text-xs text-gray-600 space-y-2 list-disc pl-5">
+                            <li>Debe existir un proceso activo.</li>
+                            <li>El código debe pertenecer al proceso actual.</li>
+                            <li>La evidencia es obligatoria.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <footer
+        class="bg-[#001f3f] text-gray-400 text-xs h-10 flex items-center justify-between px-6 shrink-0 border-t border-gray-800">
+        <div><strong>Módulo activo:</strong> <span id="footer-modulo" class="text-gray-300">GESTIÓN DE PROCESO</span>
+        </div>
+        <div class="text-gray-300"><i data-lucide="shield-check" class="inline w-4 h-4 text-green-400 mr-1"></i>Código
+            de verificación: <strong class="text-amber-400">ADM-2025-II-0001</strong></div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    <script src="js/navigation.js"></script>
+    <script src="js/Calificacion.js"></script>
+    <script src="js/VacantesProceso.js"></script>
+    <script src="js/CrearProceso.js"></script>
+    <script src="js/dashboard.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/vacantes.js"></script>
+    <script src="js/ExportarPDF.js"></script>
+    <script src="js/Historial.js"></script>
+    <script src="js/Anulacion.js"></script>
+</body>
+
+</html>
