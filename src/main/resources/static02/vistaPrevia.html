@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SGEA - Vista Previa del Examen</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+
+<body class="bg-slate-50 flex h-screen overflow-hidden text-slate-800">
+
+<aside id="sidebar"
+       class="w-64 bg-[#0A1931] text-white flex flex-col hidden md:flex absolute md:relative z-50 h-full transition-all duration-300">
+    <div class="h-16 flex items-center px-4 border-b border-white/10">
+        <div class="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center font-bold mr-3 shadow-lg">UN
+        </div>
+        <span class="font-semibold text-xs tracking-wider uppercase">Univ. San Luis Gonzaga</span>
+    </div>
+    <nav class="flex-1 py-4 px-3 space-y-1 overflow-y-auto">
+        <a href="index.html"
+           class="flex items-center px-3 py-2.5 bg-blue-600 text-white rounded-lg group font-medium text-sm transition-colors">
+            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
+            </svg>
+            Dashboard
+        </a>
+        <a href="editarPregunta.html"
+           class="flex items-center px-3 py-2.5 text-slate-300 hover:bg-white/10 hover:text-white rounded-lg group font-medium text-sm transition-colors">
+            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M4 7v10c0 2 1.5 3 3.5 3 2 0 3.5-1 3.5-3V7c0-2-1.5-3-3.5-3S4 5 4 7zm10.5-3C12.5 4 11 5 11 7v10c0 2 1.5 3 3.5 3 2 0 3.5-1 3.5-3V7c0-2-1.5-3-3.5-3z">
+                </path>
+            </svg>
+            Banco de preguntas
+        </a>
+        <a href="registrarPregunta.html"
+           class="flex items-center px-3 py-2.5 text-slate-300 hover:bg-white/10 hover:text-white rounded-lg group font-medium text-sm transition-colors">
+            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            </svg>
+            Registrar pregunta
+        </a>
+        <a href="generarExamen.html"
+           class="flex items-center px-3 py-2.5 text-slate-300 hover:bg-white/10 hover:text-white rounded-lg group font-medium text-sm transition-colors">
+            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2">
+                </path>
+            </svg>
+            Generar examen
+        </a>
+        <a href="vistaPrevia.html"
+           class="flex items-center px-3 py-2.5 text-slate-300 hover:bg-white/10 hover:text-white rounded-lg group font-medium text-sm transition-colors">
+            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
+                </path>
+            </svg>
+            Vista previa del examen
+        </a>
+        <a href="historialExamen.html"
+           class="flex items-center px-3 py-2.5 text-slate-300 hover:bg-white/10 hover:text-white rounded-lg group font-medium text-sm transition-colors">
+            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            Historial de exámenes
+        </a>
+    </nav>
+</aside>
+<main class="flex-1 flex flex-col h-screen overflow-hidden">
+
+    <header class="h-16 bg-[#0A1931] flex items-center justify-end px-6 border-b border-white/10">
+        <div class="flex items-center space-x-4">
+            <div class="flex items-center space-x-2 text-white">
+                <div class="w-8 h-8 bg-slate-300 rounded-full"></div>
+                <span class="text-sm font-medium">Administrador</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="flex-1 overflow-y-auto p-8">
+
+        <div class="mb-6">
+            <h1 class="text-2xl font-bold text-[#0A1931]">Vista previa del examen generado</h1>
+            <p class="text-slate-500 text-sm mt-1">Revisa el contenido del examen antes de exportar el PDF final.
+            </p>
+        </div>
+
+        <div
+                class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 mb-6 flex flex-wrap gap-4 items-center justify-between">
+
+            <div class="flex items-center space-x-6">
+                <div>
+                    <span class="block text-xs font-medium text-slate-500 mb-1">Área</span>
+                    <div
+                            class="w-10 h-10 flex items-center justify-center rounded border border-blue-200 bg-blue-50 text-blue-700 font-bold text-sm">
+                        A</div>
+                </div>
+                <div>
+                    <span class="block text-xs font-medium text-slate-500 mb-1">Tema</span>
+                    <div
+                            class="w-10 h-10 flex items-center justify-center rounded border border-purple-200 bg-purple-50 text-purple-700 font-bold text-sm">
+                        J</div>
+                </div>
+                <div>
+                    <span class="block text-xs font-medium text-slate-500 mb-1">Pregunta actual</span>
+                    <div
+                            class="h-10 flex items-center px-3 rounded border border-slate-200 bg-slate-50 text-slate-800 font-medium text-sm">
+                        1 de 100
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex items-center space-x-3">
+                <button
+                        class="px-4 py-2 border border-slate-300 text-slate-600 rounded-lg text-sm font-medium flex items-center hover:bg-slate-50 transition">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7">
+                        </path>
+                    </svg>
+                    Tema anterior
+                </button>
+                <button
+                        class="px-4 py-2 border border-blue-600 text-blue-600 rounded-lg text-sm font-medium flex items-center hover:bg-blue-50 transition">
+                    Tema siguiente
+                    <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7">
+                        </path>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="flex items-center space-x-3 ml-auto">
+                <button
+                        class="px-4 py-2 border border-slate-300 text-slate-700 bg-white rounded-lg text-sm font-medium hover:bg-slate-50 flex items-center transition">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
+                        </path>
+                    </svg> Ver claves
+                </button>
+                <button
+                        class="px-4 py-2 bg-[#0A1931] text-white rounded-lg text-sm font-medium flex items-center hover:bg-slate-800 transition">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                        </path>
+                    </svg> Descargar PDF examen
+                </button>
+                <button
+                        class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium flex items-center hover:bg-blue-700 transition">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z">
+                        </path>
+                    </svg> Descargar PDF claves
+                </button>
+            </div>
+
+        </div>
+
+        <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+
+            <div class="xl:col-span-2">
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-8 min-h-[800px]">
+
+                    <div class="text-center mb-8 pb-6 border-b-2 border-slate-800">
+                        <h2 class="text-xl font-bold text-slate-900 mb-1">UNIVERSIDAD NACIONAL SAN LUIS GONZAGA</h2>
+                        <p class="text-slate-800 font-medium">Examen de Admisión</p>
+                        <p class="text-slate-700 mt-1">Área A - Tema J</p>
+                    </div>
+
+                    <div class="space-y-8">
+
+                        <div class="flex items-start bg-blue-50/50 p-4 rounded-lg border border-blue-100">
+                            <div
+                                    class="w-8 h-8 shrink-0 rounded-full bg-blue-600 text-white font-bold flex items-center justify-center mr-4">
+                                1</div>
+                            <div class="flex-1">
+                                <div class="flex justify-between items-start mb-3">
+                                    <p class="text-slate-800 font-medium leading-relaxed">¿Cuál de las siguientes
+                                        alternativas corresponde a una característica del Renacimiento?</p>
+                                    <span
+                                            class="bg-blue-100 text-blue-700 text-xs font-semibold px-2 py-1 rounded ml-4">Humanidades</span>
+                                </div>
+                                <div class="space-y-2 text-sm text-slate-700">
+                                    <p><span class="font-semibold mr-2">A.</span> Predominio del teocentrismo y la
+                                        escolástica.</p>
+                                    <p><span class="font-semibold mr-2">B.</span> Valoración del ser humano y del
+                                        conocimiento clásico.</p>
+                                    <p><span class="font-semibold mr-2">C.</span> Desarrollo exclusivo de la
+                                        literatura religiosa.</p>
+                                    <p><span class="font-semibold mr-2">D.</span> Rechazo al arte y a la expresión
+                                        estética.</p>
+                                    <p><span class="font-semibold mr-2">E.</span> Centralización del poder en la
+                                        Edad Media.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start p-4 border-b border-slate-100">
+                            <div
+                                    class="w-8 h-8 shrink-0 rounded-full bg-slate-200 text-slate-700 font-bold flex items-center justify-center mr-4">
+                                2</div>
+                            <div class="flex-1">
+                                <div class="flex justify-between items-start mb-3">
+                                    <p class="text-slate-800 font-medium leading-relaxed">Simplifique la siguiente
+                                        expresión: (2x² - 3x + 5) - (x² + x - 1).</p>
+                                    <span
+                                            class="bg-green-100 text-green-700 text-xs font-semibold px-2 py-1 rounded ml-4">Matemática</span>
+                                </div>
+                                <div class="space-y-2 text-sm text-slate-700">
+                                    <p><span class="font-semibold mr-2">A.</span> x² - 4x + 4</p>
+                                    <p><span class="font-semibold mr-2">B.</span> x² - 2x + 6</p>
+                                    <p><span class="font-semibold mr-2">C.</span> 3x² - 2x + 6</p>
+                                    <p><span class="font-semibold mr-2">D.</span> x² - 2x + 4</p>
+                                    <p><span class="font-semibold mr-2">E.</span> 2x² - 4x + 4</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start p-4">
+                            <div
+                                    class="w-8 h-8 shrink-0 rounded-full bg-slate-200 text-slate-700 font-bold flex items-center justify-center mr-4">
+                                3</div>
+                            <div class="flex-1">
+                                <div class="flex justify-between items-start mb-3">
+                                    <p class="text-slate-800 font-medium leading-relaxed">En el texto: "<u>La
+                                        medida</u> fue adoptada con el fin de mejorar la seguridad ciudadana",
+                                        la palabra destacada establece una relación de:</p>
+                                    <span
+                                            class="bg-purple-100 text-purple-700 text-xs font-semibold px-2 py-1 rounded ml-4">Razonamiento
+                                            Verbal</span>
+                                </div>
+                                <div class="space-y-2 text-sm text-slate-700">
+                                    <p><span class="font-semibold mr-2">A.</span> Causa</p>
+                                    <p><span class="font-semibold mr-2">B.</span> Consecuencia</p>
+                                    <p><span class="font-semibold mr-2">C.</span> Condición</p>
+                                    <p><span class="font-semibold mr-2">D.</span> Finalidad</p>
+                                    <p><span class="font-semibold mr-2">E.</span> Concesión</p>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-6">
+
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div class="p-4 border-b border-slate-100 flex items-center space-x-2">
+                        <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                            </path>
+                        </svg>
+                        <h2 class="text-[#0A1931] font-semibold text-sm">Resumen del tema</h2>
+                    </div>
+                    <div class="p-4">
+                        <ul class="space-y-3 text-sm">
+                            <li class="flex justify-between items-center"><span class="text-slate-600">Área:</span>
+                                <span class="font-bold text-slate-800">A</span></li>
+                            <li class="flex justify-between items-center"><span class="text-slate-600">Tema:</span>
+                                <span class="font-bold text-slate-800">J</span></li>
+                            <li class="flex justify-between items-center"><span class="text-slate-600">Preguntas
+                                        totales:</span> <span class="font-bold text-slate-800">100</span></li>
+                            <li class="flex justify-between items-center pt-2 border-t border-slate-100">
+                                <span class="text-slate-600">PDF examen:</span>
+                                <span
+                                        class="bg-green-100 text-green-700 px-2 py-0.5 rounded text-xs font-semibold">listo</span>
+                            </li>
+                            <li class="flex justify-between items-center">
+                                <span class="text-slate-600">PDF claves:</span>
+                                <span
+                                        class="bg-green-100 text-green-700 px-2 py-0.5 rounded text-xs font-semibold">listo</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div class="p-4 border-b border-slate-100 flex items-center space-x-2">
+                        <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z">
+                            </path>
+                        </svg>
+                        <h2 class="text-[#0A1931] font-semibold text-sm">Navegación rápida</h2>
+                    </div>
+                    <div class="p-4">
+                        <div class="grid grid-cols-5 gap-2 mb-4">
+                            <button
+                                    class="h-8 rounded bg-blue-600 text-white font-medium text-xs flex items-center justify-center">1</button>
+                            <button
+                                    class="h-8 rounded bg-slate-100 text-slate-700 hover:bg-slate-200 font-medium text-xs flex items-center justify-center transition">2</button>
+                            <button
+                                    class="h-8 rounded bg-slate-100 text-slate-700 hover:bg-slate-200 font-medium text-xs flex items-center justify-center transition">3</button>
+                            <div class="h-8 flex items-center justify-center text-slate-400">...</div>
+                            <button
+                                    class="h-8 rounded bg-slate-100 text-slate-700 hover:bg-slate-200 font-medium text-xs flex items-center justify-center transition">25</button>
+                            <button
+                                    class="h-8 rounded bg-slate-100 text-slate-700 hover:bg-slate-200 font-medium text-xs flex items-center justify-center transition">44</button>
+                            <button
+                                    class="h-8 rounded bg-slate-100 text-slate-700 hover:bg-slate-200 font-medium text-xs flex items-center justify-center transition">78</button>
+                            <button
+                                    class="h-8 rounded bg-slate-100 text-slate-700 hover:bg-slate-200 font-medium text-xs flex items-center justify-center transition">100</button>
+                        </div>
+
+                        <div class="bg-blue-50 border border-blue-100 rounded-lg p-3 flex items-start space-x-2">
+                            <div
+                                    class="w-4 h-4 rounded-full border border-blue-400 text-blue-600 flex items-center justify-center font-bold text-[10px] shrink-0 mt-0.5">
+                                i</div>
+                            <p class="text-xs text-blue-800 leading-relaxed">
+                                El sistema ya ordenó aleatoriamente las preguntas y las alternativas para el tema
+                                seleccionado.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</main>
+
+</body>
+
+</html>

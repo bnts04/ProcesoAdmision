@@ -51,18 +51,10 @@ public class BancoPreguntasController {
             @RequestParam(value = "imagen", required = false) MultipartFile imagen
     ) {
 
-    System.out.println("CONTROLADOR");
-    System.out.println("imagen = " + imagen);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(bancoPreguntasService.registrarPregunta(request, imagen));
     }
-@PostMapping("/test-imagen")
-public String testImagen(
-        @RequestParam("imagen") MultipartFile imagen
-) {
-    System.out.println("Archivo recibido: " + imagen.getOriginalFilename());
-    return "OK";
-}
+
     @GetMapping
     public ResponseEntity<List<PreguntaBancoResponse>> listarPreguntas(
             @RequestParam(required = false) ComponentePregunta componente,

@@ -37,17 +37,6 @@ public class BancoPreguntasService {
 
     @Transactional
     public PreguntaBancoResponse registrarPregunta(CrearPreguntaRequest request, MultipartFile imagen) {
-    System.out.println("=================================");
-    System.out.println("Imagen recibida: " + imagen);
-
-    if (imagen != null) {
-        System.out.println("Nombre: " + imagen.getOriginalFilename());
-        System.out.println("Tipo: " + imagen.getContentType());
-        System.out.println("Tamaño: " + imagen.getSize());
-        System.out.println("Vacía: " + imagen.isEmpty());
-    }
-
-    System.out.println("=================================");
         validarPregunta(
                 request.getComponente(),
                 request.getSubcurso(),
