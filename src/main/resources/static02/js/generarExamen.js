@@ -183,7 +183,13 @@ function configurarBotonGenerar() {
             if (response.status === 201 || response.ok) {
                 const data = await response.json();
                 alert(`¡Éxito! Examen generado correctamente.`);
-                localStorage.setItem('ultimoExamenGeneradoId', data.id || data.examenId);
+
+                // CORRECCIÓN CLAVE: Sincronizar nombres del localStorage con vistaPrevia.js
+                const idExamen = data.id || data.examenId;
+                localStorage.setItem('examenIdActual', idExamen);
+                localStorage.setItem('temaSeleccionado', temaInicial);
+                localStorage.setItem('temaInicialFormulario', temaInicial); // <-- Asegura la sincronización de la paginación
+                localStorage.setItem('cantidadTemasGenerados', cantidadTemas);
                 window.location.href = 'vistaPrevia.html';
 
             } else if (response.status === 409) {
@@ -198,7 +204,7 @@ function configurarBotonGenerar() {
                     if (mensajeError) mensajeError.innerText = errorData.mensaje || "Revisa el déficit de preguntas en el banco:";
 
                     if (listaFaltantesContenedor) {
-                        listaFaltantesContenedor.innerHTML = ''; // Limpiamos contenido anterior
+                        listaFaltantesContenedor.innerHTML = '';
 
                         const lista = errorData.faltantes;
 
@@ -251,7 +257,6 @@ function configurarBotonGenerar() {
         }
     });
 }
-
 
 function inicializarContadoresInteractivos() {
     const inputTemaInicial = document.getElementById('txtTemaInicial');
