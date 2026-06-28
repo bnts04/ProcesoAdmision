@@ -1,4 +1,24 @@
-const API_BASE_URL = 'http://localhost:8080/api/examenes';
+// --- ACTIVAR ITEM DEL SIDEBAR SEGÚN LA PÁGINA ACTUAL ---
+const paginaActual = window.location.pathname.split("/").pop() || "index.html";
+const enlacesSidebar = document.querySelectorAll("#sidebar nav a");
+
+enlacesSidebar.forEach(enlace => {
+    const rutaEnlace = enlace.getAttribute("href");
+
+    if (paginaActual === rutaEnlace) {
+        // Estilos para el enlace ACTIVO (Azul brillante)
+        enlace.className = "flex items-center px-3 py-2.5 bg-blue-600 text-white rounded-lg group font-medium text-sm transition-colors";
+    } else {
+        // Estilos para los enlaces INACTIVOS (Gris/Azul oscuro)
+        // Excepto el de Vista Previa si sigue bloqueado, claro
+        if (enlace.id !== "linkVistaPrevia") {
+            enlace.className = "flex items-center px-3 py-2.5 text-slate-300 hover:bg-white/10 hover:text-white rounded-lg group font-medium text-sm transition-colors";
+        }
+    }
+});
+// --------------------------------------------------------
+
+const API_BASE_URL = '/api/examenes';
 
 
 let preguntasExamen = [];
@@ -97,18 +117,13 @@ function configurarIDsBotonesNavegacion() {
     });
 }
 
-// Obtener la data del Backend (Versión Anti-Bloqueo de CORS)
 // Obtener la data del Backend de forma limpia
 async function cargarExamenGenerado(examenId, letraTema) {
     try {
         contenedorPreguntas.innerHTML = `<div class="text-center py-12 text-slate-400 italic">Cargando el Tema ${letraTema}...</div>`;
 
-        // Para evitar que el navegador dispare el molesto 'Preflight OPTIONS',
-        // hacemos la petición más simple posible, sin cabeceras personalizadas.
         const response = await fetch(`${API_BASE_URL}/${examenId}/temas/${letraTema}/vista-previa`, {
             method: 'GET'
-            // Quitamos 'mode: cors' y las Headers 'Content-Type' o 'Accept' personalizadas.
-            // Al ser una petición GET limpia y directa, el navegador NO envía Preflight (OPTIONS)
         });
 
         if (!response.ok) throw new Error("No se pudo recuperar el examen generado.");
@@ -130,14 +145,28 @@ async function cargarExamenGenerado(examenId, letraTema) {
         if(txtTemaResumen) txtTemaResumen.innerText = temaTexto;
         if(txtTotalPreguntasResumen) txtTotalPreguntasResumen.innerText = totalPreguntasTexto;
 
-        // Reiniciamos los badges a "pendiente" cada vez que se cambia de tema
+        // NUEVO: Sincronización de los badges leyendo el historial persistente de descargas
+        const llaveExamenExamen = `descargado_examen_${examenIdActual}_${letraTema}`;
+        const llaveExamenClaves = `descargado_claves_${examenIdActual}_${letraTema}`;
+
         if(badgePdfExamen) {
-            badgePdfExamen.innerText = "pendiente";
-            badgePdfExamen.className = "bg-slate-100 text-slate-600 px-2 py-0.5 rounded text-xs font-semibold";
+            if (localStorage.getItem(llaveExamenExamen) === 'true') {
+                badgePdfExamen.innerText = "listo";
+                badgePdfExamen.className = "bg-green-100 text-green-700 px-2 py-0.5 rounded text-xs font-semibold";
+            } else {
+                badgePdfExamen.innerText = "pendiente";
+                badgePdfExamen.className = "bg-slate-100 text-slate-600 px-2 py-0.5 rounded text-xs font-semibold";
+            }
         }
+
         if(badgePdfClaves) {
-            badgePdfClaves.innerText = "pendiente";
-            badgePdfClaves.className = "bg-slate-100 text-slate-600 px-2 py-0.5 rounded text-xs font-semibold";
+            if (localStorage.getItem(llaveExamenClaves) === 'true') {
+                badgePdfClaves.innerText = "listo";
+                badgePdfClaves.className = "bg-green-100 text-green-700 px-2 py-0.5 rounded text-xs font-semibold";
+            } else {
+                badgePdfClaves.innerText = "pendiente";
+                badgePdfClaves.className = "bg-slate-100 text-slate-600 px-2 py-0.5 rounded text-xs font-semibold";
+            }
         }
 
         preguntasExamen = data.preguntas || [];
@@ -260,7 +289,7 @@ function configurarBotonesAccion() {
                     <svg class="w-4 h-4 mr-2 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
                         <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"></path>
                         <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.523 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"></path>
-                    </svg> Ocultar claves
+                    </svg Ocultar claves
                 `;
             } else {
                 btnVerClaves.innerHTML = `
@@ -279,6 +308,13 @@ function configurarBotonesAccion() {
         btnFinalizarProceso.onclick = () => {
             const confirmar = confirm("¿Estás seguro de que deseas finalizar este proceso? Esto limpiará la vista previa hasta que generes un nuevo examen.");
             if (confirmar) {
+                // NUEVO: Limpiar las llaves del historial de descargas al terminar todo el flujo
+                Object.keys(localStorage).forEach(key => {
+                    if (key.startsWith('descargado_examen_') || key.startsWith('descargado_claves_')) {
+                        localStorage.removeItem(key);
+                    }
+                });
+
                 localStorage.removeItem('examenIdActual');
                 localStorage.removeItem('temaSeleccionado');
                 localStorage.removeItem('temaInicialFormulario');
@@ -314,6 +350,9 @@ function configurarBotonesAccion() {
                     badgePdfExamen.innerText = "listo";
                     badgePdfExamen.className = "bg-green-100 text-green-700 px-2 py-0.5 rounded text-xs font-semibold";
                 }
+
+                // NUEVO: Guardar persistentemente que este examen/tema ya se descargó
+                localStorage.setItem(`descargado_examen_${examenIdActual}_${temaActual}`, 'true');
 
                 // Paso 3: Descarga real segura mediante un ancla oculta (Evita romper el contexto CORS)
                 const linkDescarga = document.createElement('a');
@@ -360,6 +399,9 @@ function configurarBotonesAccion() {
                     badgePdfClaves.className = "bg-green-100 text-green-700 px-2 py-0.5 rounded text-xs font-semibold";
                 }
 
+                // NUEVO: Guardar persistentemente que estas claves ya se descargaron
+                localStorage.setItem(`descargado_claves_${examenIdActual}_${temaActual}`, 'true');
+
                 // Paso 3: Descarga real segura mediante un ancla oculta (Evita romper el contexto CORS)
                 const linkDescarga = document.createElement('a');
                 linkDescarga.href = `${API_BASE_URL}/pdf/descargar/${nombreArchivoGenerado}`;
@@ -378,7 +420,7 @@ function configurarBotonesAccion() {
             }
         };
     }
-} // <-- Llave de cierre corregida aquí para separar correctamente las funciones
+}
 
 // Genera los botones numéricos 1, 2, 3... según la cantidad real de preguntas
 function generarMatrizNavegacion() {

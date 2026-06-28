@@ -1,3 +1,23 @@
+// --- ACTIVAR ITEM DEL SIDEBAR SEGÚN LA PÁGINA ACTUAL ---
+const paginaActual = window.location.pathname.split("/").pop() || "index.html";
+const enlacesSidebar = document.querySelectorAll("#sidebar nav a");
+
+enlacesSidebar.forEach(enlace => {
+    const rutaEnlace = enlace.getAttribute("href");
+
+    if (paginaActual === rutaEnlace) {
+        // Estilos para el enlace ACTIVO (Azul brillante)
+        enlace.className = "flex items-center px-3 py-2.5 bg-blue-600 text-white rounded-lg group font-medium text-sm transition-colors";
+    } else {
+        // Estilos para los enlaces INACTIVOS (Gris/Azul oscuro)
+        // Excepto el de Vista Previa si sigue bloqueado, claro
+        if (enlace.id !== "linkVistaPrevia") {
+            enlace.className = "flex items-center px-3 py-2.5 text-slate-300 hover:bg-white/10 hover:text-white rounded-lg group font-medium text-sm transition-colors";
+        }
+    }
+});
+// --------------------------------------------------------
+
 const API_BASE_URL = 'http://localhost:8080/api/banco-preguntas';
 let preguntaSeleccionadaId = null;
 let imagenModificada = false;

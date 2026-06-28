@@ -1,3 +1,23 @@
+// --- ACTIVAR ITEM DEL SIDEBAR SEGÚN LA PÁGINA ACTUAL ---
+const paginaActual = window.location.pathname.split("/").pop() || "index.html";
+const enlacesSidebar = document.querySelectorAll("#sidebar nav a");
+
+enlacesSidebar.forEach(enlace => {
+    const rutaEnlace = enlace.getAttribute("href");
+
+    if (paginaActual === rutaEnlace) {
+        // Estilos para el enlace ACTIVO (Azul brillante)
+        enlace.className = "flex items-center px-3 py-2.5 bg-blue-600 text-white rounded-lg group font-medium text-sm transition-colors";
+    } else {
+        // Estilos para los enlaces INACTIVOS (Gris/Azul oscuro)
+        // Excepto el de Vista Previa si sigue bloqueado, claro
+        if (enlace.id !== "linkVistaPrevia") {
+            enlace.className = "flex items-center px-3 py-2.5 text-slate-300 hover:bg-white/10 hover:text-white rounded-lg group font-medium text-sm transition-colors";
+        }
+    }
+});
+// --------------------------------------------------------
+
 const API_AREAS_URL = 'http://localhost:8080/api/areas-examen';
 const API_EXAMEN_URL = 'http://localhost:8080/api/examenes';
 
@@ -173,26 +193,56 @@ function configurarBotonGenerar() {
         btnGenerar.disabled = true;
         btnGenerar.innerText = "Generando examen...";
 
-        try {
-            const response = await fetch(`${API_EXAMEN_URL}/generar`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(requestData)
-            });
+       try {
+           const response = await fetch(`${API_EXAMEN_URL}/generar`, {
+               method: 'POST',
+               headers: { 'Content-Type': 'application/json' },
+               body: JSON.stringify(requestData)
+           });
 
-            if (response.status === 201 || response.ok) {
-                const data = await response.json();
-                alert(`¡Éxito! Examen generado correctamente.`);
+           if (response.status === 201 || response.ok) {
+               const data = await response.json();
 
-                // CORRECCIÓN CLAVE: Sincronizar nombres del localStorage con vistaPrevia.js
-                const idExamen = data.id || data.examenId;
-                localStorage.setItem('examenIdActual', idExamen);
-                localStorage.setItem('temaSeleccionado', temaInicial);
-                localStorage.setItem('temaInicialFormulario', temaInicial); // <-- Asegura la sincronización de la paginación
-                localStorage.setItem('cantidadTemasGenerados', cantidadTemas);
-                window.location.href = 'vistaPrevia.html';
+               // CORRECCIÓN CLAVE: Sincronizar nombres del localStorage con vistaPrevia.js
+               const idExamen = data.id || data.examenId;
+               localStorage.setItem('examenIdActual', idExamen);
+               localStorage.setItem('temaSeleccionado', temaInicial);
+               localStorage.setItem('temaInicialFormulario', temaInicial);
+               localStorage.setItem('cantidadTemasGenerados', cantidadTemas);
 
-            } else if (response.status === 409) {
+               // --- REEMPLAZO DEL ALERT POR TOAST FLOTANTE ---
+               const toastContainer = document.getElementById('toastContainer');
+               if (toastContainer) {
+                   // Creamos el elemento del Toast con diseño Tailwind
+                   const toast = document.createElement('div');
+                   toast.className = "pointer-events-auto flex items-center w-full max-w-xs p-4 text-slate-500 bg-white rounded-xl shadow-lg border border-emerald-100 transform translate-y-2 opacity-0 transition-all duration-300";
+                   toast.innerHTML = `
+                       <div class="inline-flex items-center justify-center flex-shrink-0 w-8 h-8 text-emerald-500 bg-emerald-100 rounded-lg">
+                           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
+                           </svg>
+                       </div>
+                       <div class="ms-3 text-sm font-semibold text-slate-800">¡Éxito! Examen generado correctamente.</div>
+                   `;
+
+                   toastContainer.appendChild(toast);
+
+                   // Pequeño truco de tiempo para activar la animación de entrada (Fade-in + deslizar)
+                   setTimeout(() => {
+                       toast.classList.remove('translate-y-2', 'opacity-0');
+                   }, 10);
+
+                   // Esperamos 1.8 segundos para que el usuario lo vea y luego redirigimos
+                   setTimeout(() => {
+                       window.location.href = 'vistaPrevia.html';
+                   }, 1800);
+
+               } else {
+                   // Por si acaso no existiera el contenedor en el HTML actual, redirige de inmediato
+                   window.location.href = 'vistaPrevia.html';
+               }
+               // ------------------------------------------------
+           } else if (response.status === 409) {
                 const errorData = await response.json();
 
                 if (modal && modalCuerpo) {

@@ -1,11 +1,30 @@
-// Usamos el endpoint que ya conocemos y sabemos que funciona
-const API_CONFIG_URL = 'http://localhost:8080/api/areas-examen/AREA_A/configuracion';
-const API_BANCO_URL = 'http://localhost:8080/api/banco-preguntas';
+// --- ACTIVAR ITEM DEL SIDEBAR SEGÚN LA PÁGINA ACTUAL ---
+const paginaActual = window.location.pathname.split("/").pop() || "index.html";
+const enlacesSidebar = document.querySelectorAll("#sidebar nav a");
 
-// Guardamos los componentes de forma global para la interacción de la tabla
+enlacesSidebar.forEach(enlace => {
+    const rutaEnlace = enlace.getAttribute("href");
+
+    if (paginaActual === rutaEnlace) {
+        // Estilos para el enlace ACTIVO (Azul brillante)
+        enlace.className = "flex items-center px-3 py-2.5 bg-blue-600 text-white rounded-lg group font-medium text-sm transition-colors";
+    } else {
+        // Estilos para los enlaces INACTIVOS (Gris/Azul oscuro)
+        // Excepto el de Vista Previa si sigue bloqueado, claro
+        if (enlace.id !== "linkVistaPrevia") {
+            enlace.className = "flex items-center px-3 py-2.5 text-slate-300 hover:bg-white/10 hover:text-white rounded-lg group font-medium text-sm transition-colors";
+        }
+    }
+});
+// --------------------------------------------------------
+
+// Forzamos la URL completa para descartar problemas de rutas
+const API_BASE = 'http://localhost:8080';
+const API_CONFIG_URL = `${API_BASE}/api/areas-examen/AREA_A/configuracion`;
+const API_BANCO_URL = `${API_BASE}/api/banco-preguntas`;
+
 let componentesGlobal = [];
 
-// Tu diccionario exacto de subcursos aceptados por el sistema
 const subcursosPorComponente = {
   'CTA': [
     { value: 'FISICA', label: 'Física' },
@@ -21,10 +40,10 @@ const subcursosPorComponente = {
   'HUMANIDADES': [
     { value: 'HISTORIA', label: 'Historia' },
     { value: 'LENGUAJE', label: 'Lenguaje' },
-    { value: 'LITERATURA', label: 'Literatura' }, // <-- Agregada coma faltante
-    { value: 'ECONOMIA', label: 'Economía' },     // <-- Agregada coma faltante
-    { value: 'EDUCACION_CIVICA', label: 'Educación Cívica' }, // <-- Agregada coma faltante
-    { value: 'PSICOLOGIA', label: 'Psicología' },   // <-- Agregada coma faltante
+    { value: 'LITERATURA', label: 'Literatura' },
+    { value: 'ECONOMIA', label: 'Economía' },
+    { value: 'EDUCACION_CIVICA', label: 'Educación Cívica' },
+    { value: 'PSICOLOGIA', label: 'Psicología' },
     { value: 'GEOGRAFIA', label: 'Geografía' }
   ],
   'RAZONAMIENTO_VERBAL': [
@@ -35,9 +54,11 @@ const subcursosPorComponente = {
   ]
 };
 
-document.addEventListener('DOMContentLoaded', () => {
+// MODIFICACIÓN: Forzamos la ejecución inmediata pase lo que pase
+window.onload = function() {
+    console.log("🚀 El script se ha despertado exitosamente.");
     cargarDatosDashboard();
-});
+};
 
 async function cargarDatosDashboard() {
     const kpiTotal = document.getElementById('kpi-total-count');
@@ -45,14 +66,24 @@ async function cargarDatosDashboard() {
     const tbodyComponentes = document.getElementById('tabla-resumen-componentes');
 
     try {
+        console.log("📡 Conectando a:", API_CONFIG_URL);
         const response = await fetch(API_CONFIG_URL);
-        if (!response.ok) throw new Error(`Error: ${response.status}`);
+        console.log("🔹 Estado de respuesta del servidor:", response.status);
+
+        if (!response.ok) throw new Error(`Error del servidor: ${response.status}`);
 
         const data = await response.json();
-        console.log("Datos recibidos para el Dashboard:", data);
+        console.log("📦 Datos JSON recibidos:", data);
 
-        // 1. Mapeamos los componentes usando los campos conocidos desde la base de datos
-        componentesGlobal = (data.resumenComponentes || []).map(c => {
+        if (!data || !data.resumenComponentes || data.resumenComponentes.length === 0) {
+            if (tbodyComponentes) {
+                tbodyComponentes.innerHTML = `<tr><td colspan="3" class="text-center py-6 text-slate-500 font-medium">📂 Base de datos vacía o sin componentes.</td></tr>`;
+            }
+            if (kpiTotal) kpiTotal.innerText = "0";
+            return;
+        }
+
+        componentesGlobal = data.resumenComponentes.map(c => {
             return {
                 codigo: c.codigo || c.nombre?.substring(0, 3).toUpperCase() || "COMP",
                 nombre: c.nombre || c.componente || c.nombreComponente,
@@ -60,34 +91,27 @@ async function cargarDatosDashboard() {
             };
         });
 
-        // 2. Calcular el Gran Total sumando el banco de cada componente
         const totalBanco = componentesGlobal.reduce((sum, c) => sum + c.cantidad, 0);
         if (kpiTotal) kpiTotal.innerText = totalBanco;
 
-        // 3. Renderizar las Tarjetas de los Componentes (Arriba) y las Filas de la Tabla (Abajo)
         let htmlKpis = '';
         let htmlTabla = '';
 
         componentesGlobal.forEach(comp => {
             htmlKpis += `
-                <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 transition-all hover:shadow-md">
+                <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
                     <h3 class="text-blue-600 font-bold text-xs tracking-wider uppercase mb-3">${comp.codigo}</h3>
                     <div class="flex justify-between items-end">
                         <div>
                             <p class="text-3xl font-bold text-slate-800">${comp.cantidad}</p>
                             <p class="text-[11px] text-slate-400 truncate max-w-[120px]" title="${comp.nombre}">${comp.nombre}</p>
                         </div>
-                        <div class="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 shadow-sm">
-                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z"></path>
-                            </svg>
-                        </div>
                     </div>
                 </div>
             `;
 
             htmlTabla += `
-                <tr class="bg-white border-b border-slate-100 hover:bg-slate-50/50 transition-colors">
+                <tr class="bg-white border-b border-slate-100 hover:bg-slate-50/50">
                     <td class="px-6 py-4 font-medium text-slate-900">
                         <div class="font-semibold text-slate-700">${comp.nombre}</div>
                         <span class="text-[10px] bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded font-mono uppercase">${comp.codigo}</span>
@@ -95,7 +119,7 @@ async function cargarDatosDashboard() {
                     <td class="px-6 py-4 text-center font-bold text-slate-600">${comp.cantidad}</td>
                     <td class="px-6 py-4 text-center">
                         <button onclick="mostrarDetalleSubcursos('${comp.nombre}')"
-                                class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition-all shadow-sm active:scale-95">
+                                class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-3 py-1.5 rounded-lg">
                             Ver detalle
                         </button>
                     </td>
@@ -103,26 +127,32 @@ async function cargarDatosDashboard() {
             `;
         });
 
-        if (contenedorKpis) contenedorKpis.innerHTML = htmlKpis;
+        // MODIFICACIÓN DE SEGURIDAD: Evitamos el conflicto con la clase 'contents' de Tailwind
+        if (contenedorKpis) {
+            contenedorKpis.classList.remove('contents');
+            contenedorKpis.classList.add('grid', 'grid-cols-1', 'sm:grid-cols-2', 'md:grid-cols-4', 'gap-4', 'col-span-full');
+            contenedorKpis.innerHTML = htmlKpis;
+        }
         if (tbodyComponentes) tbodyComponentes.innerHTML = htmlTabla;
 
-        // Cargar por defecto el desglose del primer componente de la lista usando la distribución estática
         if (componentesGlobal.length > 0) {
             filtrarYMostrarSubcursos(componentesGlobal[0].nombre, componentesGlobal[0].codigo);
         }
 
     } catch (error) {
-        console.error("Error en Dashboard:", error);
-        if (tbodyComponentes) tbodyComponentes.innerHTML = `<tr><td colspan="3" class="text-center py-4 text-red-500 text-xs font-medium">Error al sincronizar con el banco de preguntas.</td></tr>`;
+        console.error("❌ Error atrapado en catch del Dashboard:", error);
+        if (tbodyComponentes) {
+            tbodyComponentes.innerHTML = `<tr><td colspan="3" class="text-center py-4 text-red-500 text-xs font-medium">⚠️ Error: ${error.message}</td></tr>`;
+        }
     }
 }
 
-// 4. Interacción al hacer clic en "Ver detalle"
+// ... Las funciones mostrarDetalleSubcursos y filtrarYMostrarSubcursos se quedan exactamente igual abajo ...
+
 async function mostrarDetalleSubcursos(nombreComponente) {
     try {
         const compObj = componentesGlobal.find(c => c.nombre === nombreComponente);
         const codigoComponente = compObj ? compObj.codigo : "";
-
         filtrarYMostrarSubcursos(nombreComponente, codigoComponente);
     } catch (e) {
         console.error("Error al refrescar subcursos", e);
@@ -164,17 +194,13 @@ async function filtrarYMostrarSubcursos(nombreComponente, codigoComponente) {
 
      if (listaSubcursosEstaticos.length > 0) {
          try {
-             // El bucle 'for...of' irá consultando uno a uno de forma dinámica sin importar cuántos añadas
              for (const sub of listaSubcursosEstaticos) {
                  let cantidadReal = 0;
-
                  const response = await fetch(`${API_BANCO_URL}?subcurso=${sub.value}`);
 
                  if (response.ok) {
                      const datosPreguntas = await response.json();
-
                      if (Array.isArray(datosPreguntas)) {
-                         amountReal = datosPreguntas.length;
                          cantidadReal = datosPreguntas.length;
                      } else if (datosPreguntas && typeof datosPreguntas === 'object') {
                          cantidadReal = datosPreguntas.total || datosPreguntas.cantidad || 0;
@@ -213,7 +239,7 @@ async function filtrarYMostrarSubcursos(nombreComponente, codigoComponente) {
      }
 
      panelDerecho.innerHTML = `
-         <div class="bg-white rounded-xl shadow-sm border border-blue-200 overflow-hidden animate-fadeIn">
+         <div class="bg-white rounded-xl shadow-sm border border-blue-200 overflow-hidden">
              <div class="p-4 bg-blue-50 border-b border-blue-100 flex justify-between items-center">
                  <div class="flex items-center space-x-2 text-blue-800 font-bold text-sm">
                      <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
